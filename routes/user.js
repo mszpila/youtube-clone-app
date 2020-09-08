@@ -162,7 +162,9 @@ router.post(
 
 router.get("/me", auth, async (req, res) => {
 	try {
-		// request.user is getting fetched from Middleware after token authentication
+		// request.user is getting fetched from Middleware after token
+		// authentication
+		console.log("user ", req.user, "only id ", req.user.id);
 		const user = await User.findById(req.user.id);
 		res.json(user);
 	} catch (e) {

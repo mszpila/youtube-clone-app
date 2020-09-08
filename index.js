@@ -1,7 +1,9 @@
 require("dotenv").config();
 const express = require("express");
 const user = require("./routes/user");
+const video = require("./routes/video");
 const cookieParser = require("cookie-parser");
+const multer = require("multer");
 const InitiateMongoServer = require("./config/db");
 
 // Initiate Mongo Server
@@ -20,6 +22,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/user", user);
+app.use("/video", video);
 
 app.listen(PORT, (req, res) => {
 	console.log(`Server Started at PORT ${PORT}`);
