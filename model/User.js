@@ -17,8 +17,9 @@ const UserSchema = mongoose.Schema({
 		type: Date,
 		default: Date.now(),
 	},
-	urls: {
-		videos: [],
+	videos: {
+		type: Array,
+		default: [],
 	},
 });
 
