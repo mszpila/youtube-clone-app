@@ -3,13 +3,17 @@ const router = express.Router();
 const multer = require("multer");
 const User = require("../model/User");
 const Video = require("../model/Video");
+const Commentary = require("../model/Comment");
 const auth = require("../middleware/auth");
 const ffmpeg = require("fluent-ffmpeg");
+const fs = require("fs");
+const path = require("path");
+const Visitor = require("../model/Visitor");
 
 // Set storage
 let storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-		cb(null, "uploads/videos/");
+		cb(null, "public/uploads/videos/");
 	},
 	filename: function (req, file, cb) {
 		// cb(null, file.fieldname + "-" + Date.now());
@@ -69,7 +73,9 @@ const createPreview = (
 			.inputOptions([`-ss ${startPreviewInSec}`])
 			.outputOptions([`-t ${previewDurationInSec}`])
 			.noAudio()
+			.size("1920x1080")
 			.format("gif")
+			.outputOption(["-loop -1"])
 			.output(outputPath)
 			.on("end", function () {
 				resolve(outputPath);
@@ -77,6 +83,28 @@ const createPreview = (
 			.on("error", function () {
 				reject("Cannot create the preview");
 			})
+			.run();
+	});
+};
+
+const createXFrames = (
+	inputPath,
+	outputPath,
+	sourceDurationInSec,
+	numberOfFrames
+) => {
+	return new Promise((resolve, reject) => {
+		// 1/frameIntervalInSeconds = 1 frame each x seconds
+		const frameIntervalInSeconds = Math.floor(
+			sourceDurationInSec / numberOfFrames
+		);
+
+		return ffmpeg()
+			.input(inputPath)
+			.outputOptions([`-vf fps=1/${frameIntervalInSeconds}`])
+			.output(outputPath)
+			.on("end", resolve)
+			.on("error", reject)
 			.run();
 	});
 };
@@ -93,12 +121,11 @@ const createThumbnails = (inputPath, outputPath, customFilename) => {
 		let thumbsPath = [];
 		return ffmpeg()
 			.input(inputPath)
+			.format("gif")
 			.on("filenames", function (filenames) {
-				// console.log("Will generate " + filenames.join(", "));
 				thumbsPath = filenames.map((item) => `${outputPath}/${item}`);
 			})
 			.on("end", function () {
-				// console.log("Screenshots taken");
 				resolve(thumbsPath);
 			})
 			.on("error", reject)
@@ -106,77 +133,433 @@ const createThumbnails = (inputPath, outputPath, customFilename) => {
 				// Will take screens at 20%, 40%, 60% and 80% of the video
 				count: 1,
 				folder: outputPath,
-				filename: `${customFilename}_%i`,
+				filename: `${customFilename}.gif`,
+				size: "1920x1080",
 			});
 	});
 };
 
-router.post("/upload", upload.single("video"), auth, async (req, res) => {
+const createXFramesPreview = (
+	framesPath,
+	thumbnailPath,
+	outputPath,
+	tempDir
+) => {
+	return new Promise((resolve, reject) => {
+		return (
+			ffmpeg()
+				.input(framesPath)
+				// .addInput(thumbnailPath)
+				// .input(thumbnailPath)
+				.size("1920x1080")
+				.format("gif")
+				.inputFPS(2.5)
+				.outputOption(["-loop -1"])
+				// .mergeToFile(outputPath, tempDir)
+				.output(outputPath)
+				.on("end", function () {
+					resolve(outputPath);
+				})
+				.on("error", function () {
+					reject("Cannot create the preview");
+				})
+				.run()
+		);
+	});
+};
+
+router.post("/upload", auth, upload.single("video"), async (req, res) => {
 	const customFilename = req.file.filename.split(".").slice(0, -1)[0];
 	// generate thumbnail
-	// four thumbs for the user to choose
 	const thumbs = await createThumbnails(
 		req.file.path,
-		"uploads/thumbnails",
+		"public/uploads/thumbnails",
 		customFilename
 	);
 
 	// get metadata of the uploaded video
-	const duration = await getDuration(req.file.path);
+	const durationMetadata = await getDuration(req.file.path);
+	const duration = Math.floor(durationMetadata);
 
 	// generate preview
 	const preview = await createPreview(
 		req.file.path,
-		`uploads/previews/${customFilename}.gif`,
-		Math.floor(duration)
+		`public/uploads/previews/${customFilename}.gif`,
+		duration
 	);
 
-	// create the new model in db - video with url to itself, its
-	// thumbnail and preview = no need for creating folders with proper
-	// names etc., just links in db
+	// const previewThumb = await previewWithThumb(
+	// 	`public/uploads/previews/${customFilename}.gif`,
+	// 	`public/uploads/thumbnails/${customFilename}.gif`,
+	// 	`public/uploads/previews/${customFilename}_new.gif`
+	// );
 
-	// how to distinguish two files with the same name? by Date.now(),
-	// the tile can be the same, because it is not the part of the file
-	// name saved in the public folder
+	// const frames = await createXFrames(
+	// 	req.file.path,
+	// 	`public/uploads/frames/${customFilename}_%d.png`,
+	// 	duration,
+	// 	10
+	// );
 
-	// send user generated thumbs, but don't save them until the user
-	// choose one by click and send it back to you, he can also use
-	// custom/own thumbnail
+	// const framesPreview = await createXFramesPreview(
+	// 	`public/uploads/frames/${customFilename}_%d.png`, // frames input
+	// 	`public/uploads/thumbnails/${customFilename}.png`, // thumbnail input
+	// 	`public/uploads/previews/${customFilename}_x.gif`, // path the save the frame preview
+	// 	`public/uploads/temp`
+	// );
 
-	// distinguish between upload video and save video
+	// for (let i = 0; i < 11; i++) {
+	// 	fs.unlink(
+	// 		path.join(`public/uploads/frames/${customFilename}_${i}.png`),
+	// 		function (err) {
+	// 			if (err && err.code == "ENOENT") {
+	// 				// file doens't exist
+	// 				// console.info("File doesn't exist, won't remove it.");
+	// 				// return res.json(err);
+	// 			} else if (err) {
+	// 				// other errors, e.g. maybe we don't have enough permission
+	// 				// console.error("Error occurred while trying to remove file");
+	// 				// return res.json(err);
+	// 			}
+	// 		}
+	// 	);
+	// }
 
-	// save the urls in db - it should be the last thing to
-	// execute before returning json
 	let video = new Video({
-		owner: req.user.id,
+		user: req.user.id,
 		title: customFilename,
-		date: customFilename.split("_")[0],
 		urls: {
 			video_url: req.file.path.replace(/\\/g, "/"),
 			thumbnail_url: thumbs[0],
 			preview_url: preview,
 		},
+		duration,
 	});
 	await video.save();
 	User.findByIdAndUpdate(
 		req.user.id,
 		{
 			$push: {
-				videos: video,
-				// video_url: `${req.file.path.replace(/\\/g, "/")}`,
-				// thumbnail_url: thumbs[0],
-				// preview_url: preview,
+				videos: video._id,
 			},
 		},
-		function (err, model) {
-			if (err) console.log(err);
+		function (err) {
+			if (err) console.error(err);
 			return res.json({ success: true, video });
 		}
 	);
-	// console.log("preview: ", preview, "thumbs:", thumbs);
-	// return res.json({ success: true });
 });
 
-router.post("/thumbnail", (req, res) => {});
+router.get("/getVideos", (req, res) => {
+	const { limit = 20, offset = 0 } = req.query;
+	Video.countDocuments({ private: false }, (err, total) => {
+		Video.find({ private: false })
+			.populate("user")
+			.sort("-createdAt")
+			.skip(parseInt(offset))
+			.limit(parseInt(limit))
+			.exec((err, videos) => {
+				if (err) return res.status(400).send(err);
+				res.status(200).json({ videos, total, offset, limit });
+			});
+	});
+});
+
+router.get("/getVideoById", (req, res) => {
+	Video.findById(req.query.id)
+		.populate("user")
+		.populate({
+			path: "comments",
+			populate: {
+				path: "author",
+			},
+		})
+		.exec((err, video) => {
+			if (err) return res.status(400).send(err);
+			res.status(200).json({ video });
+		});
+});
+
+router.post("/save", auth, async (req, res) => {
+	const { title, description, category, private, id } = req.body;
+	const video = await Video.findById(id).populate("user");
+	if (video.user.id === req.user.id) {
+		Video.findByIdAndUpdate(
+			{ _id: req.body.id },
+			{
+				$set: {
+					title,
+					description,
+					// category,
+					private,
+					publishDate: Date.now(),
+				},
+			},
+			(err, saved) => {
+				if (err) return res.status(400).json({ err });
+				res.status(200).json({ saved });
+			}
+		);
+	} else {
+		res.status(401).json({ message: "forbbiden access" });
+	}
+});
+
+router.get("/getComments", async (req, res) => {
+	const { id, limit = 10, offset = 0 } = req.query;
+	Commentary.countDocuments(
+		{ videoId: id, isComment: true },
+		(err, total) => {
+			Commentary.find({ videoId: id, isComment: true })
+				.populate("author")
+				.sort("-createdAt")
+				.skip(parseInt(offset))
+				.limit(parseInt(limit))
+				.exec((err, comments) => {
+					if (err) return res.status(400).send(err);
+					res.status(200).json({ comments, total, offset, limit });
+				});
+		}
+	);
+});
+
+router.post("/addComment", auth, async (req, res) => {
+	const { video_id, content } = req.body;
+	const video = await Video.findById(video_id);
+	const comment = new Commentary({
+		author: req.user.id,
+		content,
+		videoId: video_id,
+		isComment: true,
+	});
+
+	await video.updateOne({
+		$push: {
+			comments: comment._id,
+		},
+		$inc: {
+			commentsNumber: 1,
+		},
+	});
+	await comment.save();
+	comment.populate("author", (err, comment) => {
+		if (err) console.error(err);
+		return res.json(comment);
+	});
+});
+
+// router.post("/addCommentOld", auth, async (req, res) => {
+// 	const { video_id, content } = req.body;
+// 	const video = await Video.findById(video_id); // id of the video
+// 	const comment = new Commentary({
+// 		author: req.user.id,
+// 		content,
+// 		videoId: video._id,
+// 	});
+// 	await comment.save();
+// 	video.updateOne(
+// 		{
+// 			$push: {
+// 				comments: comment._id,
+// 			},
+// 			$inc: {
+// 				commentsNumber: 1,
+// 			},
+// 		},
+// 		function (err) {
+// 			if (err) console.log(err);
+// 			return res.json({ success: true, video, comment });
+// 		}
+// 	);
+// });
+
+router.post("/addReply", auth, async (req, res) => {
+	const { video_id, comment_id, content } = req.body;
+	const reply = new Commentary({
+		author: req.user.id,
+		content,
+		videoId: video_id,
+		isComment: false,
+	});
+
+	await Commentary.findByIdAndUpdate(
+		comment_id,
+		{
+			$push: {
+				reply: reply._id,
+			},
+			$inc: {
+				repliesNumber: 1,
+			},
+		}
+		// function (err, doc) {
+		// 	if (err) console.log(err);
+		// 	return res.json({ success: true, reply });
+		// }
+	);
+	await reply.save();
+	reply.populate("author", (err, reply) => {
+		if (err) console.error(err);
+		return res.json(reply);
+	});
+});
+
+// router.post("/addReplyOld", auth, async (req, res) => {
+// 	const { comment_id, content } = req.body;
+// 	const reply = new Commentary({
+// 		author: req.user.id,
+// 		content,
+// 	});
+// 	await reply.save();
+// 	Commentary.findByIdAndUpdate(
+// 		comment_id,
+// 		{
+// 			$push: {
+// 				reply: reply._id,
+// 			},
+// 			$inc: {
+// 				repliesNumber: 1,
+// 			},
+// 		},
+// 		function (err, doc) {
+// 			if (err) console.log(err);
+// 			return res.json({ success: true, reply });
+// 		}
+// 	);
+// });
+
+router.get("/loadReply", (req, res) => {
+	const { comment_id } = req.query;
+	Commentary.findById(comment_id)
+		// .populate("reply")
+		.populate({
+			path: "reply",
+			populate: {
+				path: "author",
+			},
+		})
+		.exec((err, reply) => {
+			if (err) return res.json(err);
+			return res.json(reply);
+		});
+});
+
+router.get("/getVideoReactions", (req, res) => {
+	Video.findById(req.query.id)
+		.select("likes dislikes")
+		.exec((err, reactions) => {
+			if (err) return res.json({ success: false, err });
+			return res.json({ success: true, reactions });
+		});
+});
+
+router.get("/videoHistory", auth, async (req, res) => {
+	const { limit = 20, offset = 0 } = req.body;
+	// const history = await User.findById(req.user.id).select("videoHistory");
+	const query = await User.findById(req.user.id).select({
+		videoHistory: { $slice: [offset, limit] },
+	});
+	res.status(200).json({ success: true, query });
+});
+router.post("/addToHistory", auth, async (req, res) => {
+	const { video_id } = req.body;
+	// check if it is already in the array
+	// if so, change its index
+	// if not, push it
+	const stored = await User.findById(req.user.id)
+		.where("videoHistory")
+		.in([video_id]);
+	if (stored) {
+		await User.findByIdAndUpdate(req.user.id, {
+			$pull: { videoHistory: video_id },
+		});
+	}
+	await User.findByIdAndUpdate(req.user.id, {
+		$push: {
+			videoHistory: video_id,
+		},
+	});
+	return res.status(200).json({ success: true, stored });
+});
+router.post("/removeFromHistory", auth, async (req, res) => {
+	const { video_id } = req.body;
+	// find it and remove it from the array
+	await User.findByIdAndUpdate(req.user.id, {
+		$pull: { videoHistory: video_id },
+	});
+	return res.status(200).json({ success: true });
+});
+
+router.get("/myVideos", auth, (req, res) => {
+	const { limit = 10, offset = 0 } = req.query;
+	Video.countDocuments({ user: req.user.id }, (err, total) => {
+		Video.find({ user: req.user.id })
+			.sort("-createdAt")
+			.skip(parseInt(offset))
+			.limit(parseInt(limit))
+			.exec((err, videos) => {
+				if (err) return res.status(400).send(err);
+				res.status(200).json({ videos, total, offset, limit });
+			});
+	});
+});
+
+router.post("/remove", auth, async (req, res) => {
+	const { id } = req.body;
+	// if (id !== req.user.id) {
+	// 	res.status(401).json("you don't own this video");
+	// }
+	const video = await Video.findById(id).select("urls");
+	let files = [];
+	files.push(video.urls.video_url);
+	files.push(video.urls.thumbnail_url);
+	files.push(video.urls.preview_url);
+
+	files.forEach((file) => {
+		fs.unlink(path.join(file), function (err) {
+			if (err && err.code == "ENOENT") {
+				// file doens't exist
+				// console.info("File doesn't exist, won't remove it.");
+				// return res.json(err);
+			} else if (err) {
+				// other errors, e.g. maybe we don't have enough permission
+				// console.error("Error occurred while trying to remove file");
+				// return res.json(err);
+			}
+			// else {
+			// 	console.info(`removed`);
+			// }
+		});
+	});
+	Video.findByIdAndDelete(id, (err, deletedVideo) => {
+		if (err) return res.json(err);
+		Commentary.deleteMany({ videoId: id }, (err, deletedComments) => {
+			if (err) return res.json(err);
+			res.status(200).json(true);
+		});
+	});
+});
+
+router.post("/addView", async (req, res) => {
+	const { id, hash } = req.body;
+	const visited = await Visitor.find({ videoId: id, hash });
+	if (!visited.length) {
+		let visitor = new Visitor({
+			videoId: id,
+			hash,
+		});
+		await visitor.save();
+		Video.findByIdAndUpdate(
+			{ _id: id },
+			{ $inc: { views: 1 } },
+			(err, update) => {
+				res.status(200).json(update);
+			}
+		);
+	}
+});
+
+router.get("/getThumbnail", (req, res) => {});
+router.post("/uploadThumbnail", (req, res) => {});
 
 module.exports = router;
