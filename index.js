@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const multer = require("multer");
 const InitiateMongoServer = require("./config/db");
 const cors = require("cors");
+const path = require("path");
 
 // Initiate Mongo Server
 InitiateMongoServer();
@@ -21,15 +22,20 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors()); // { origin: "http://localhost:3000/", credentials: true })
 app.use("/public", express.static("public"));
+app.use(express.static(path.join(__dirname, "client/build")));
 
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
 	res.json({ message: "API Working" });
 });
 
-app.use("/user", user);
-app.use("/video", video);
-app.use("/comment", comment);
-app.use("/search", search);
+app.use("/api/user", user);
+app.use("/api/video", video);
+app.use("/api/comment", comment);
+app.use("/api/search", search);
+
+app.get("*", (req, res) => {
+	res.sendFile(path.join(__dirname + "/client/build/index.html"));
+});
 
 app.listen(PORT, (req, res) => {
 	console.log(`Server Started at PORT ${PORT}`);
