@@ -19,7 +19,7 @@ function MainPage() {
 	useEffect(() => {
 		dispatch(setSidebar(true));
 		axios
-			.get("/video/getVideos")
+			.get("/api/video/getVideos")
 			.then((response) => {
 				setVideos(response.data.videos);
 				setData((state) => ({
@@ -59,7 +59,7 @@ function MainPage() {
 			setIsFetching(true);
 			active = false;
 			axios
-				.get("/video/getVideos", {
+				.get("/api/video/getVideos", {
 					params: { offset: data.offset + data.limit },
 				})
 				.then((response) => {

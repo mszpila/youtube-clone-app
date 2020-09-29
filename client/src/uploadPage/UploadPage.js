@@ -32,7 +32,7 @@ function UploadPage() {
 	const steps = getSteps();
 
 	useEffect(() => {
-		axios.get("/user/me/").catch((err) => {
+		axios.get("/api/user/me/").catch((err) => {
 			console.error(err.data);
 			if (loginState) {
 				history.push("/login");
@@ -73,7 +73,7 @@ function UploadPage() {
 
 	const handleDrop = (files) => {
 		axios
-			.get("/user/me/")
+			.get("/api/user/me/")
 			.then((response) => {
 				dispatch(setLoginState(true));
 				dispatch(saveUser(response.data));
@@ -100,7 +100,7 @@ function UploadPage() {
 					percentCompleted === 100
 				) {
 					axios
-						.get("/user/me/")
+						.get("/api/user/me/")
 						.then((response) => {
 							dispatch(setLoginState(true));
 							dispatch(saveUser(response.data));
@@ -118,7 +118,7 @@ function UploadPage() {
 		};
 		formData.append("video", files[0]);
 		axios
-			.post("/video/upload", formData, config)
+			.post("/api/video/upload", formData, config)
 			.then((response) => {
 				setVideo(response.data.video);
 			})
@@ -128,7 +128,7 @@ function UploadPage() {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		axios
-			.post("/video/save", {
+			.post("/api/video/save", {
 				id: video._id,
 				title,
 				description,

@@ -27,7 +27,7 @@ function EditPage({
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		axios
-			.post("/video/save", {
+			.post("/api/video/save", {
 				id: videoId,
 				title,
 				description,

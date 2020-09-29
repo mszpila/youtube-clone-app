@@ -103,7 +103,7 @@ function ChannelPage() {
 	};
 
 	useEffect(() => {
-		axios.get("/user/me/").catch((err) => {
+		axios.get("/api/user/me/").catch((err) => {
 			if (loginState) {
 				history.push("/login");
 			} else {
@@ -116,7 +116,7 @@ function ChannelPage() {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		axios
-			.post("/video/save", {
+			.post("/api/video/save", {
 				id: videoId,
 				title,
 				description,
@@ -128,7 +128,7 @@ function ChannelPage() {
 
 	useEffect(() => {
 		axios
-			.get("/video/myVideos", { withCredentials: true })
+			.get("/api/video/myVideos", { withCredentials: true })
 			.then((response) => {
 				setMyVideos(response.data.videos);
 				setData((state) => ({
@@ -142,7 +142,7 @@ function ChannelPage() {
 	}, []);
 
 	const handleRemove = (id) => {
-		axios.post("/video/remove", { id }, { withCredentials: true });
+		axios.post("/api/video/remove", { id }, { withCredentials: true });
 	};
 
 	useEffect(() => {
@@ -175,7 +175,7 @@ function ChannelPage() {
 			setIsFetching(true);
 			active = false;
 			axios
-				.get("/video/myVideos", {
+				.get("/api/video/myVideos", {
 					params: { offset: data.offset + data.limit },
 					withCredentials: true,
 				})

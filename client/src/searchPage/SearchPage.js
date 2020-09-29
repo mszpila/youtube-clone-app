@@ -25,7 +25,7 @@ function SearchPage() {
 
 	useEffect(() => {
 		axios
-			.get("/search/partial", {
+			.get("/api/search/partial", {
 				params: { search },
 				// withCredentials: true,
 			})
@@ -71,7 +71,7 @@ function SearchPage() {
 			setIsFetching(true);
 			active = false;
 			axios
-				.get("/search/partial", {
+				.get("/api/search/partial", {
 					params: { search, offset: data.offset + data.limit },
 				})
 				.then((response) => {

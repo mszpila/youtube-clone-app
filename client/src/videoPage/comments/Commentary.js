@@ -40,7 +40,7 @@ function Commentary({
 
 	const fetchCommentState = () => {
 		axios
-			.get(`/user/reactionComment`, {
+			.get(`/api/user/reactionComment`, {
 				params: { commentContext: comment_id },
 			})
 			.then((response) => {
@@ -57,7 +57,7 @@ function Commentary({
 		setShowReplies((showReplies) => !showReplies);
 		if (!repliesFetch || repliesFetch.length !== repliesAmount) {
 			axios
-				.get(`/video/loadReply`, {
+				.get(`/api/video/loadReply`, {
 					params: { comment_id },
 				})
 				.then((response) => {
@@ -92,7 +92,7 @@ function Commentary({
 				setCommentReaction(false);
 			}
 			axios
-				.post(`/user/reactionComment`, {
+				.post(`/api/user/reactionComment`, {
 					comment_id,
 					state,
 				})
@@ -116,7 +116,7 @@ function Commentary({
 				setCommentReaction(null);
 			}
 			axios
-				.post(`/user/reactionComment`, {
+				.post(`/api/user/reactionComment`, {
 					comment_id,
 					state,
 				})

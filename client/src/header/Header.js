@@ -52,7 +52,7 @@ function Header() {
 	useEffect(() => {
 		// setOpenPop(false);
 		axios
-			.get("/user/me/")
+			.get("/api/user/me/")
 			.then((response) => {
 				setFetchedUser(response.data.avatar);
 				dispatch(setLoginState(true));
@@ -84,7 +84,7 @@ function Header() {
 
 	const handleLogOut = () => {
 		axios
-			.post("/user/logout", null, { withCredentials: true })
+			.post("/api/user/logout", null, { withCredentials: true })
 			.then(() => {
 				setOpenPop(false);
 				dispatch(setLoginState(false));

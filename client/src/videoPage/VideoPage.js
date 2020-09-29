@@ -45,7 +45,7 @@ function VideoPage() {
 					let hash = Fingerprint2.x64hash128(values.join(""), 31);
 					setHash(hash);
 					axios
-						.post("/video/addView", { id, hash })
+						.post("/api/video/addView", { id, hash })
 						.catch((err) => console.error(err.data));
 				});
 			});
@@ -58,7 +58,7 @@ function VideoPage() {
 					let hash = Fingerprint2.x64hash128(values.join(""), 31);
 					setHash(hash);
 					axios
-						.post("/video/addView", { id, hash })
+						.post("/api/video/addView", { id, hash })
 						.catch((err) => console.error(err.data));
 				});
 			}, 500);
@@ -68,12 +68,11 @@ function VideoPage() {
 	useEffect(() => {
 		dispatch(setSidebar(false));
 		axios
-			.get(`/video/getVideoById`, {
+			.get("/api/video/getVideoById", {
 				params: { id },
 				withCredentials: true,
 			})
 			.then((response) => {
-				console.log('getvideobyid', response.data)
 				setVideo(response.data.video);
 				setSubsAmount(response.data.video.user.subscribers);
 				fetchSubscriptionReaction(response.data.video.user._id);
@@ -85,7 +84,7 @@ function VideoPage() {
 
 	const fetchVideoReaction = () => {
 		axios
-			.get(`/user/reactionVideo`, {
+			.get("/api/user/reactionVideo", {
 				params: { videoContext: id },
 				withCredentials: true,
 			})
@@ -97,7 +96,7 @@ function VideoPage() {
 
 	const fetchSubscriptionReaction = (user_id) => {
 		axios
-			.get(`/user/me/subscribe`, {
+			.get("/api/user/me/subscribe", {
 				params: { user_id },
 				withCredentials: true,
 			})
@@ -143,7 +142,7 @@ function VideoPage() {
 			}
 			axios
 				.post(
-					`/user/reactionVideo`,
+					"/api/user/reactionVideo",
 					{
 						video_id: id,
 						state,
@@ -172,7 +171,7 @@ function VideoPage() {
 			}
 			axios
 				.post(
-					`/user/reactionVideo`,
+					"/api/user/reactionVideo",
 					{
 						video_id: id,
 						state,
@@ -217,7 +216,7 @@ function VideoPage() {
 		}
 		axios
 			.post(
-				`/user/me/subscribe`,
+				"/api/user/me/subscribe",
 				{
 					user_id: video.user._id, // id of the video publisher
 				},
@@ -370,7 +369,7 @@ function VideoPage() {
 										)}
 									</p>
 									<p className="videoPage__subs">
-										{subsAmount ? (
+										{subsAmount !== null ? (
 											subsAmount !== 1 ? (
 												`${subsAmount} subscriptions`
 											) : (

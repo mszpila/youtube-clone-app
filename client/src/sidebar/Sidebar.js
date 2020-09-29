@@ -27,7 +27,7 @@ function Sidebar() {
 	useEffect(() => {
 		if (!fetchedSubs) {
 			axios
-				.get("/user/me/subscriptions")
+				.get("/api/user/me/subscriptions")
 				.then((response) => {
 					setFetchedSubs(response.data.subscriptions);
 				})

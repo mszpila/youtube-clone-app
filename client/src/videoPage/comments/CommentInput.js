@@ -30,7 +30,7 @@ function CommentInput({
 		if (type === "comment") {
 			axios
 				.post(
-					`/video/addComment`,
+					`/api/video/addComment`,
 					{
 						video_id,
 						content: commentInput,
@@ -68,7 +68,7 @@ function CommentInput({
 		} else if (type === "reply") {
 			axios
 				.post(
-					`/video/addReply`,
+					`/api/video/addReply`,
 					{
 						video_id,
 						comment_id,
@@ -105,7 +105,7 @@ function CommentInput({
 
 	const handleFocus = () => {
 		axios
-			.get("/user/me/")
+			.get("/api/user/me/")
 			.then((response) => {
 				dispatch(setLoginState(true));
 				dispatch(saveUser(response.data));

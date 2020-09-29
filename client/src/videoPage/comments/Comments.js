@@ -26,7 +26,7 @@ function Comments({ commentsNumber }) {
 
 	useEffect(() => {
 		axios
-			.get(`/video/getComments`, {
+			.get(`/api/video/getComments`, {
 				params: { id },
 			})
 			.then((response) => {
@@ -76,7 +76,7 @@ function Comments({ commentsNumber }) {
 			setIsFetching(true);
 			active = false;
 			axios
-				.get("/video/getComments", {
+				.get("/api/video/getComments", {
 					params: { id, offset: data.offset + data.limit },
 				})
 				.then((response) => {

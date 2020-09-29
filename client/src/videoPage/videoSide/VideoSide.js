@@ -13,7 +13,7 @@ function VideoSide() {
 	let active = true;
 
 	useEffect(() => {
-		axios.get("/video/getVideos").then((response) => {
+		axios.get("/api/video/getVideos").then((response) => {
 			setVideos(response.data.videos);
 			setData((state) => ({
 				...state,
@@ -55,7 +55,7 @@ function VideoSide() {
 			setIsFetching(true);
 			active = false;
 			axios
-				.get("/video/getVideos", {
+				.get("/api/video/getVideos", {
 					params: { offset: data.offset + data.limit, limit: 10 },
 				})
 				.then((response) => {

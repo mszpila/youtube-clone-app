@@ -31,7 +31,7 @@ function RegistrationPage() {
 		else if (validateFields.confirmPassword(password, confirmation))
 			return setError("Passowrds must be the same");
 		axios
-			.post("/user/signup", {
+			.post("/api/user/signup", {
 				username,
 				email,
 				password,

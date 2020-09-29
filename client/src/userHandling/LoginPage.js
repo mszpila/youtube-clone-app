@@ -20,7 +20,11 @@ function LoginPage() {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		axios
-			.post("/user/login", { email, password }, { withCredentials: true })
+			.post(
+				"/api/user/login",
+				{ email, password },
+				{ withCredentials: true }
+			)
 			.then(() => {
 				dispatch(setLoginState(true));
 				history.goBack();
