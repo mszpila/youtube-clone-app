@@ -172,17 +172,14 @@ router.get("/me", auth, async (req, res) => {
 	}
 });
 
-router.get("/me/subscriptions", auth, async (req, res) => {
-	try {
-		await User.findById(req.user.id)
-			.select("subscriptions")
-			.populate("subscriptions", (err, subscriptions) => {
-				if (err) res.send(err);
-				res.status(200).json({ subscriptions });
-			});
-	} catch (e) {
-		res.send({ message: "Error in Fetching user" });
-	}
+router.get("/me/subscriptions", auth, (req, res) => {
+	User.findById(req.user.id)
+		.select("subscriptions")
+		.populate("subscriptions")
+		.exec((err, subscriptions) => {
+			if (err) res.send(err);
+			res.status(200).json(subscriptions);
+		});
 });
 
 router.get("/me/subscribe", auth, async (req, res) => {
