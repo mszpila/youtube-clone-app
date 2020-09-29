@@ -84,11 +84,7 @@ function VideoSide() {
 						title={video.title}
 						user={video.user?.username}
 						views={`${video.views} views`}
-						published={new Date(video.createdAt)
-							.toUTCString()
-							.split(" ")
-							.slice(1, 4)
-							.join(" ")}
+						published={video.createdAt}
 						duration={video.duration}
 						isLoading={isLoading}
 					/>

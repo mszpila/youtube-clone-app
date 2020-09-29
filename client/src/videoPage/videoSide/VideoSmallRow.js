@@ -3,6 +3,7 @@ import "./VideoSmallRow.css";
 import Skeleton from "@material-ui/lab/Skeleton";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import localeData from "dayjs/plugin/localeData";
 dayjs.extend(relativeTime);
 dayjs.extend(localeData);
 
