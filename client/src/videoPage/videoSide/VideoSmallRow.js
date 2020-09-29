@@ -4,6 +4,7 @@ import Skeleton from "@material-ui/lab/Skeleton";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
+dayjs.extend(localeData);
 
 function VideoSmallRow({
 	thumbnail,
