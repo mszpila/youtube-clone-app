@@ -1,0 +1,9 @@
+.videoSide {
+	margin-top: 16px;
+	/* margin: 16px 24px; */
+}
+
+.videoSide__link {
+	text-decoration: none;
+	color: inherit;
+}

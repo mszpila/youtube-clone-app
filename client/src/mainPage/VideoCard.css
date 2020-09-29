@@ -1,0 +1,86 @@
+.videoCard {
+	margin: 0 8px;
+	margin-bottom: 40px;
+	/* width: 260px; */
+	/* width: 18vw; */
+}
+
+.videoCard__imgWrapper {
+	background: #272727;
+	width: 100%;
+	height: 0;
+	padding-top: 56.25%;
+	position: relative;
+}
+
+.videoCard__thumbnail {
+	/* width: 260px; */
+	width: 100%;
+	/* height: auto; */
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+/* .videoCard__thumbnail:hover {
+	background: url("images/card-front.jpg") no-repeat;
+} */
+
+.videoCard__time {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	margin: 3px;
+	padding: 3px 4px;
+	font-size: 12px;
+	font-weight: 500;
+	letter-spacing: 0.5px;
+	background: rgba(0, 0, 0, 0.7);
+	border-radius: 2px;
+	transition: opacity 200ms ease-in;
+}
+
+.videoCard__hideTime {
+	opacity: 0;
+}
+
+.videoCard__info {
+	display: flex;
+	align-items: flex-start;
+	margin-top: 12px;
+	overflow-wrap: anywhere;
+}
+
+.videoCard__details {
+	/* margin-left: 10px; */
+	font-size: 14px;
+	width: 100%;
+	padding-right: 24px;
+}
+
+.videoCard__details > h4 {
+	margin-bottom: 6px;
+}
+
+.videoCard__data > p {
+	color: #aaaaaa;
+}
+
+.videoCard__avatar {
+	height: 36px !important;
+	width: 36px !important;
+	/* margin-top: 12px; */
+	margin-right: 12px;
+}
+
+.MuiSkeleton-root {
+	background: #272727 !important;
+}
+
+.MuiSkeleton-pulse {
+	animation: none !important;
+}
+
+.MuiSkeleton-text {
+	transform: none !important;
+}

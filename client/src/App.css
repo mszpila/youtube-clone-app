@@ -1,0 +1,8 @@
+/* .app__menu {
+	position: sticky;
+} */
+
+.app__display {
+	display: flex;
+	/* position: sticky; */
+}

@@ -1,0 +1,87 @@
+.videoChannel {
+	display: flex;
+	/* justify-content: space-between; */
+	justify-content: center;
+	margin-top: 16px;
+}
+
+.videoChannel__removed {
+	display: flex;
+	justify-content: center;
+	padding: 20px;
+	color: #aaaaaa;
+}
+
+.videoChannel__container {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+	/* margin-top: 16px; */
+}
+
+.videoChannel__link {
+	text-decoration: none;
+	color: inherit;
+	display: flex;
+	width: 100%;
+	overflow: hidden;
+}
+
+.videoChannel__imgWrapper {
+	background: #272727;
+	width: 160px;
+	height: 90px;
+	/* padding-top: 56.25%; */
+	position: relative;
+}
+
+.videoChannel__details {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	/* width: 50%; */
+	margin: 0 16px;
+}
+
+.videoChannel__title {
+	font-size: 20px;
+	font-weight: 400;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.videoChannel__buttons {
+	display: flex;
+	margin-right: 24px;
+}
+
+.videoChannel__edit,
+.videoChannel__remove {
+	cursor: pointer;
+	height: fit-content;
+	/* font-weight: 500; */
+	font-size: 15px;
+	padding: 8px 12px;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.videoChannel__edit > .MuiSvgIcon-root,
+.videoChannel__remove > .MuiSvgIcon-root {
+	height: 16px !important;
+	width: 16px !important;
+	margin-left: 4px;
+	/* text-decoration: underline; */
+}
+
+.videoChannel__edit {
+	background: #065fd4;
+}
+
+.videoChannel__remove {
+	background: #cc0000;
+	margin-left: 16px;
+}

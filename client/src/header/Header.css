@@ -1,0 +1,186 @@
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 3px;
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background: #252525;
+}
+
+.header__logo {
+	height: 50px;
+	object-fit: contain;
+	cursor: pointer;
+}
+
+.header__left {
+	display: flex;
+	/* justify-content: space-between; */
+	align-items: center;
+	margin-left: 20px;
+	color: white;
+}
+
+.header__search {
+	display: flex;
+	/* justify-content: space-between; */
+	align-items: center;
+	width: 45vw;
+	/* border: 1px solid #424242; */
+	border-radius: 2px;
+	background: #424242;
+	height: 30px;
+}
+
+.header__input {
+	display: flex;
+	align-items: center;
+	border: none;
+	flex: 1;
+	background: #1b1b1b;
+	/* outline-style: none; */
+	margin: 1px;
+	border-radius: 2px;
+	padding: 0px 5px;
+	height: 26px;
+	color: #ffffff;
+	font-size: 14px;
+	height: 28px;
+	/* padding: 2px 6px; */
+}
+
+.header__input:focus {
+	outline-style: none;
+	/* background-color: black;
+	color: grey; */
+	/* min-width: 0;
+	width: 100%; */
+}
+
+.header__link--search {
+	text-decoration: none;
+	color: inherit;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 65px;
+}
+
+.header__search > .MuiSvgIcon-root {
+	display: flex;
+	background: #424242;
+	width: 65px;
+	/* border-left: 1px solid #424242; */
+	/* border: 1px solid; */
+	color: #757575;
+	cursor: pointer;
+}
+
+.header__features {
+	display: flex;
+	/* justify-content: space-between; */
+	align-items: center;
+}
+
+.header__feature {
+	/* margin-right: 20px; */
+	color: white;
+	height: 30px;
+	width: 30px;
+}
+
+.header__link {
+	display: flex;
+}
+
+.header__feature--avatar {
+	height: 30px !important;
+	width: 30px !important;
+	/* margin-right: 20px; */
+	margin: 12px !important;
+	margin-right: 24px !important;
+	cursor: pointer;
+}
+
+.header__icons {
+	display: flex;
+	align-items: center;
+}
+
+/* .MuiIconButton-root:checked {
+	background-color: rgba(255, 255, 255, 0.1) !important;
+} */
+
+.header__popper {
+	background: #272727fa;
+	max-width: 300px;
+	/* width: 200px; */
+	/* height: 100px; */
+	max-height: 650px;
+	/* padding: 12px; */
+	color: #ffffff;
+	/* font-weight: 400; */
+	/* font-size: 16px; */
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.2);
+	border-radius: 2px;
+}
+
+.header__popperUser {
+	padding: 16px;
+	border-bottom: 1px solid #383838;
+	display: flex;
+	align-items: center;
+}
+
+.header__popperAvatar {
+	margin-right: 16px;
+}
+
+.header__popperUserInfo {
+	font-size: 16px;
+	display: flex;
+	flex-direction: column;
+}
+
+.header__popperUser {
+	font-weight: 500;
+}
+
+.header__popperEmail {
+	font-size: 14px;
+	color: #aaaaaa;
+}
+
+.header__popperSection {
+	padding: 8px 0;
+}
+
+.header__popperLogOut {
+	/* width: max-content; */
+	/* margin: 8px 0; */
+	padding: 8px 16px;
+	display: flex;
+	align-items: center;
+	font-size: 14px;
+}
+
+.header__popperLogOut:hover {
+	cursor: pointer;
+	background: #363636fa;
+}
+
+.header__popperLogOut > .MuiSvgIcon-root {
+	height: 24px !important;
+	width: 24px !important;
+	color: #aaaaaa;
+	margin-right: 16px;
+}
+
+.header__popperOptionTitle {
+	color: #ffffff;
+}

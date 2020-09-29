@@ -1,0 +1,85 @@
+.uploadVideo__title {
+	font-size: 20px;
+	font-weight: 400;
+	margin-bottom: 24px;
+	padding: 16px 0;
+	padding-left: 24px;
+	border-bottom: 1px solid #373737;
+}
+
+.uploadVideo__circleDrop {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 36px;
+}
+
+.uploadVideo__circleDrop:focus {
+	outline-style: none;
+}
+
+.uploadVideo__section {
+	/* background: gray; */
+	/* border-radius: 50%;
+	height: 200px;
+	width: 200px; */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin-top: 96px;
+}
+
+.uploadVideo__dropfield {
+	cursor: pointer;
+	background: #373737;
+	border-radius: 50%;
+	height: 144px;
+	width: 144px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.uploadVideo__dropfield:focus {
+	outline-style: none;
+}
+
+.uploadVideo__dropfield > .MuiSvgIcon-root {
+	height: 48px !important;
+	width: 48px !important;
+}
+
+.uploadVideo__info {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 36px;
+}
+
+.uploadVideo__infoMain {
+	font-size: 15px;
+	margin-bottom: 8px;
+}
+
+.uploadVideo__infoExtra {
+	font-size: 13px;
+	color: #aaaaaa;
+}
+
+.uploadVideo__btn {
+	border: none;
+	background: #065fd4;
+	color: #ffffff;
+	padding: 8px 16px;
+	font-weight: 500;
+	font-size: 14px;
+	border-radius: 2px;
+}
+
+.uploadVideo__btn:hover {
+	cursor: pointer;
+}
+
+.uploadVideo__btn:focus {
+	outline-style: none;
+}

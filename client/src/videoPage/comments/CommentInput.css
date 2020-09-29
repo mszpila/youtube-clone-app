@@ -1,0 +1,76 @@
+.commentInput__userAction {
+	display: flex;
+	/* flex-direction: column; */
+	margin-bottom: 24px;
+}
+
+.commentInput__avatar {
+	margin-right: 16px;
+}
+
+.commentInput__main {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.commentInput__userComment {
+	display: flex;
+	align-items: flex-start;
+}
+
+.commentInput_input {
+	width: 100%;
+	background: inherit;
+	border: none;
+	border-bottom: 1px solid #383838;
+	padding: 0;
+	font-size: 14px;
+	color: #ffffff;
+	height: auto;
+	resize: none;
+}
+
+.commentInput_input:focus {
+	outline-style: none;
+}
+
+.commentInput__userButtons {
+	/* display: flex; */
+	justify-content: flex-end;
+	margin-top: 4px;
+	margin-right: 2px;
+	display: none;
+}
+
+.commentInput__display {
+	display: flex;
+}
+
+.commentInput__cancelButton,
+.commentInput__commentButton {
+	border: none;
+	background: inherit;
+	color: #aaaaaa;
+	padding: 10px 16px;
+	cursor: pointer;
+}
+
+.commentInput__cancelButton:focus,
+.commentInput__commentButton:focus {
+	outline-style: none;
+}
+
+.commentInput__cancelButton {
+}
+
+.commentInput__commentButton {
+	background: #3ea6ff;
+	margin-left: 12px;
+	border-radius: 2px;
+	color: #222222;
+}
+
+.commentInput__buttonOff {
+	background: #aaaaaa;
+}

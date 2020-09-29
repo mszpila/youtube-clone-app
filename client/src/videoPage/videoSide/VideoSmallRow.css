@@ -1,0 +1,59 @@
+.videoSmallRow {
+	/* margin: 0 8px; */
+	margin-bottom: 8px;
+	/* width: 260px; */
+	/* width: 18vw; */
+	display: grid;
+	grid-template-columns: 35% 60%;
+}
+
+.videoSmallRow__imgWrapper {
+	background: #272727;
+	width: 100%;
+	height: 0;
+	padding-top: 56.25%;
+	position: relative;
+}
+
+.videoSmallRow__thumbnail {
+	/* width: 260px; */
+	width: 100%;
+	/* height: auto; */
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+/* .videoSmallRow__thumbnail:hover {
+	background: url("images/card-front.jpg") no-repeat;
+} */
+
+.videoSmallRow__info {
+	/* display: flex; */
+	/* align-items: flex-start; */
+	/* margin-top: 12px; */
+	margin-left: 8px;
+}
+
+.videoSmallRow__details {
+	/* margin-left: 10px; */
+	font-size: 14px;
+	overflow-wrap: anywhere;
+}
+
+.videoSmallRow__details > h4 {
+	margin-bottom: 4px;
+}
+
+.videoSmallRow__data > p {
+	color: #aaaaaa;
+	font-size: 13px;
+	margin-bottom: 2px;
+}
+
+.videoSmallRow__avatar {
+	height: 36px !important;
+	width: 36px !important;
+	/* margin-top: 12px; */
+	margin-right: 12px;
+}

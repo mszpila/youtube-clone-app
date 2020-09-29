@@ -1,0 +1,227 @@
+.videoPage {
+	display: grid;
+	grid-template-columns: 67% 33%;
+}
+
+@media only screen and (max-width: 1200px) {
+	.videoPage {
+		grid-template-columns: 100%;
+	}
+}
+
+.videoPage__wrapper {
+	position: relative;
+	/* padding-top: 56.25%; Player ratio: 100 / (1280 / 720) */
+	background: black;
+}
+
+.videoPage__player {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.videoPage__cover {
+	position: fixed;
+	z-index: 1;
+	height: 100%;
+	width: 100%;
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.videoPage__main {
+	padding-top: 16px;
+}
+
+.videoPage__videoDetails {
+	padding: 12px 24px;
+}
+
+hr {
+	height: 1px;
+	border: 0;
+	background: #383838;
+}
+
+.videoPage__firstSection {
+	/* display: flex; */
+	/* justify-content: space-between; */
+	/* border-bottom: 1px solid white; */
+}
+
+.videoPage__title {
+	font-size: 18px;
+}
+
+.videoPage__viewsPublished {
+	font-size: 14px;
+	color: #aaaaaa;
+	/* margin-bottom: 12px; */
+}
+
+.videoPage__reactions {
+	display: flex;
+	align-items: center;
+	color: #aaaaaa;
+}
+
+.videoPage__handsLikes {
+	display: flex;
+	border-bottom: 2px solid #aaaaaa;
+	margin-left: 12px;
+	height: 40px;
+	cursor: pointer;
+}
+
+.videoPage__blueBorder {
+	border-bottom: 2px solid #3ea6ff;
+}
+
+.videoPage__likes,
+.videoPage__dislikes {
+	display: flex;
+	align-items: center;
+	margin-right: 12px;
+}
+
+.videoPage__likes > p,
+.videoPage__dislikes > p {
+	font-size: 13px;
+	margin-left: 12px;
+}
+
+.videoPage__likes > .MuiSvgIcon-root,
+.videoPage__dislikes > .MuiSvgIcon-root {
+	height: 20px;
+	width: 20px;
+}
+
+.videoPage__blue {
+	color: #3ea6ff;
+}
+
+.videoPage__secondSection {
+	/* display: flex; */
+	/* justify-content: space-between; */
+	/* border-bottom: 1px solid white; */
+	/* padding-top: 16px; */
+	margin-bottom: 24px;
+}
+
+.videoPage__authorStatus {
+	display: flex;
+	justify-content: space-between;
+	padding-top: 16px;
+	margin-bottom: 12px;
+}
+
+/* .videoPage__authorStatus > button { */
+.videoPage__subscribe {
+	background: #cc0000;
+	border: none;
+	color: #ffffff;
+	/* font-family: -apple-system, BlinkMacSystemFont, Roboto, "Segoe UI", Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; */
+	font-weight: 500;
+	font-size: 14px;
+	border-radius: 2px;
+	height: 36px;
+	width: 118px;
+	margin-right: 2px;
+	cursor: pointer;
+}
+
+.videoPage__subscribed {
+	background: #333333;
+	color: #aaaaaa;
+}
+
+.videoPage__authorStatus > button:focus {
+	outline-style: none;
+}
+
+.videoPage__authorDetails {
+	display: flex;
+	/* justify-content: space-between; */
+}
+
+.videoPage__avatar {
+	margin-right: 16px;
+}
+
+.videoPage__authorText {
+	display: flex;
+	flex-direction: column;
+}
+
+.videoPage__username {
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.videoPage__subs {
+	font-size: 13px;
+	color: #aaaaaa;
+}
+
+.videoPage__description {
+	margin-left: 56px;
+	font-size: 14px;
+	margin-bottom: 16px;
+	margin-right: 124px;
+	position: relative;
+}
+
+.videoPage__showButton {
+	cursor: pointer;
+	font-size: 13px;
+	color: #aaaaaa;
+	margin-top: 8px;
+	font-weight: 500;
+}
+
+.videoPage__popper {
+	background: #272727;
+	max-width: 400px;
+	/* width: 200px; */
+	/* height: 100px; */
+	max-height: 175px;
+	/* padding: 12px; */
+	color: #ffffff;
+	/* font-weight: 400; */
+	/* font-size: 16px; */
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.2);
+}
+
+.videoPage__popperText {
+	border-bottom: 1px solid #383838;
+}
+
+.videoPage__popperTitle {
+	font-size: 16px;
+	margin: 24px 0 16px;
+	padding: 0 24px;
+}
+
+.videoPage__popperInfo {
+	margin: 4px 0 32px;
+	padding: 0 24px;
+	font-size: 14px;
+	color: #aaaaaa;
+}
+
+.videoPage__link {
+	/* padding: 8px 0px 8px; */
+	text-decoration: none;
+	width: max-content;
+	margin: 16px 24px;
+}
+
+.videoPage__signIn {
+	/* margin: 10px 24px; */
+	color: #3ea6ff;
+	font-weight: 400;
+}

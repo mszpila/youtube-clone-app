@@ -1,0 +1,30 @@
+.sidebarOption {
+	display: flex;
+	align-items: center;
+	color: gray;
+	height: 40px;
+	/* cursor: pointer; */
+	/* transition: 200ms color ease-in; */
+	text-decoration: none;
+	padding: 0 24px;
+}
+
+/* .sidebarOption__icon {} */
+
+.sidebarOption.selected {
+	background: #363636;
+	color: #ffffff;
+}
+
+.sidebarOption__title {
+	/* flex: 1; */
+	margin-left: 24px;
+	font-size: 14px;
+	/* font-weight: 500; */
+}
+
+.sidebarOption:hover {
+	background: #363636;
+	color: #ffffff;
+	cursor: pointer;
+}

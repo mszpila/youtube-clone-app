@@ -1,0 +1,30 @@
+.player__wrapper {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	/* padding-top: 56.25%; */
+	background: black;
+	/* visibility: visible;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.4);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	transition: visibility 1s ease-in-out; */
+}
+
+.player__player {
+	position: relative;
+	padding-top: 56.25%;
+}
+
+.player__player > video {
+	width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+}

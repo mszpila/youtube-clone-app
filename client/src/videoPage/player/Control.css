@@ -1,0 +1,172 @@
+.controls__wrapper {
+	/* visibility: visible; */
+	opacity: 1;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 100%;
+	/* background: "rgba(0,0,0,0.6)"; */
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	transition: opacity 500ms ease-out;
+}
+
+.controls__main {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	flex-direction: column;
+	height: 100%;
+}
+.controls__main > .MuiSlider-root {
+	border-radius: 10px !important;
+	padding: 6px 0 !important;
+}
+
+.controls__play > .MuiSvgIcon-root {
+	height: 30px !important;
+	width: 30px !important;
+}
+
+.controls__displayControl {
+	width: 100%;
+	height: 100%;
+}
+
+#timeline {
+	width: 97%;
+	color: #cc0000 !important;
+}
+
+#timeline > .MuiSlider-thumb {
+	display: none !important;
+}
+
+#timeline > .MuiSlider-rail {
+	color: #ffffff !important;
+}
+
+#timeline:hover > .MuiSlider-rail,
+#timeline:hover > .MuiSlider-track {
+	height: 4px !important;
+}
+
+#timeline:hover > .MuiSlider-thumb {
+	display: flex !important;
+	/* margin-top: 1px; */
+}
+
+.controls__icons {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	padding: 0 16px 8px;
+	color: #dddddd;
+	transition: color 800ms ease-in;
+}
+
+.controls__basic {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.controls__basic > .MuiIconButton-root,
+.controls__basic > .MuiButton-text {
+	padding: 0 !important;
+}
+
+.controls__basic > div,
+.controls__extra > svg {
+	margin-right: 12px;
+	cursor: pointer;
+	/* height: 30px !important;
+    width: 30px !important; */
+}
+
+.controls__basic > div:hover,
+.controls__extra > svg:hover {
+	margin-right: 12px;
+	color: #ffffff;
+}
+
+.controls__play {
+	display: flex;
+}
+
+.controls__volume {
+	display: flex;
+	align-items: center;
+	width: 15px;
+	/* width: 65px; */
+	/* transform: scale(); */
+	transition: width 200ms;
+}
+
+.controls__volume:hover {
+	width: 5.5rem;
+}
+
+.controls__volume > .MuiSlider-root {
+	color: #ffffff !important;
+	visibility: hidden;
+}
+
+.controls__volume:hover > .MuiSlider-root {
+	visibility: visible;
+}
+
+.controls__volumeBtn {
+	display: flex;
+	margin-right: 8px;
+}
+
+#volumeline > .MuiSlider-rail,
+#volumeline > .MuiSlider-track {
+	height: 3px !important;
+}
+
+#volumeline > .MuiSlider-thumb::after {
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+.controls__elapsedTime {
+	color: #ffffff;
+	font-size: 13px;
+	display: flex;
+	align-items: center;
+	margin-left: 8px;
+	cursor: default !important;
+}
+
+.controls__extra {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.controls__settings {
+	height: 20px !important;
+	width: 20px !important;
+}
+
+.controls__fullscreen {
+	height: 24px !important;
+	width: 24px !important;
+}
+
+/* .MuiSvgIcon-root {
+	height: 36 !important;
+	width: 36 !important;
+} */
+
+/* .MuiIconButton-root {
+	padding: 0;
+} */

@@ -1,0 +1,45 @@
+.searchPage {
+	margin-left: 240px;
+	padding: 16px 24px;
+}
+
+.searchPage__fullwidth {
+	margin: 0;
+}
+
+.searchPage__filter {
+	/* display: flex;
+	align-items: center; */
+	font-size: xx-small !important;
+	color: #aaaaaa;
+	/* padding: 6px 16px; */
+	/* margin: ; */
+}
+
+.searchPage__filter--clickable {
+	display: flex;
+	align-items: center;
+	padding: 6px 0;
+	width: 80px;
+}
+
+.searchPage__filter:hover {
+	color: #ffffff;
+	cursor: pointer;
+}
+
+.searchPage__filter > h2 {
+	margin-left: 10px;
+}
+
+.searchPage__filter > hr {
+	height: 1px;
+	border: 0;
+	background: #383838;
+	/* margin-top: 12px; */
+	/* margin-bottom: 10px; */
+}
+
+/* .searchPage__video {
+    margin
+} */

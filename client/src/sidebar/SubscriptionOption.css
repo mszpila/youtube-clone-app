@@ -1,0 +1,33 @@
+.subscriptionOption {
+	display: flex;
+	align-items: center;
+	color: gray;
+	height: 40px;
+	/* cursor: pointer; */
+	/* transition: 200ms color ease-in; */
+	text-decoration: none;
+	padding: 0 24px;
+}
+
+.subscriptionOption__title {
+	/* flex: 1; */
+	margin-left: 24px;
+	font-size: 14px;
+	font-weight: 450;
+}
+
+.subscriptionOption__avatar {
+	height: 16px !important;
+	width: 16px !important;
+}
+
+.subscriptionOption > .MuiAvatar-root {
+	height: 24px !important;
+	width: 24px !important;
+}
+
+.subscriptionOption:hover {
+	background: #363636;
+	color: #ffffff;
+	cursor: pointer;
+}

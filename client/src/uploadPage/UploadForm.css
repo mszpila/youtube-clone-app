@@ -1,0 +1,120 @@
+/* .MuiTypography-colorTextSecondary {
+    color: #ffffff;
+} */
+
+.uploadForm__title {
+	font-size: 20px;
+	font-weight: 400;
+	margin-bottom: 24px;
+	padding: 16px 0;
+	padding-left: 24px;
+	border-bottom: 1px solid #373737;
+}
+
+.uploadForm {
+	display: flex;
+	justify-content: space-around;
+	/* align-items: center; */
+	width: 100%;
+	padding: 0 24px;
+}
+
+.uploadForm__form {
+	width: 100%;
+}
+
+.upload__field {
+	width: 100%;
+}
+
+.uploadForm__privacyRadio {
+	font-size: 14px;
+	padding: 16px 0;
+}
+
+.uploadForm__radioOption {
+	margin-bottom: 16px;
+	display: flex;
+	cursor: pointer;
+	width: fit-content;
+}
+
+.uploadForm__info {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	margin-left: 12px;
+}
+
+.uploadForm__radioLabel {
+	font-size: 15px;
+	font-weight: 350;
+}
+
+.uploadForm__radioSubtitle {
+	font-size: 13px;
+	color: #aaaaaa;
+	/* margin-left: 27px; */
+}
+
+/* .uploadForm__radioContainer {
+	display: grid;
+	grid-template-columns: min-content auto;
+	grid-gap: 0.5em;
+}
+
+.uploadForm__radioOption {
+	display: flex;
+}
+
+.uploadForm__radioOption > input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.uploadForm__radioOption > input:checked + .uploadForm__radioCustom {
+	background: radial-gradient(currentcolor 50%, rgba(255, 0, 0, 0) 51%);
+}
+
+.uploadForm__radioCustom {
+	display: block;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	border: 0.1em solid currentColor;
+}
+
+.uploadForm__radioLabel {
+	line-height: 1;
+} */
+
+/* .uploadForm__privacyRadio > #public {
+	margin-left: 8px;
+} */
+
+.uploadForm__video {
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	width: 100%;
+	margin-top: 16px;
+}
+
+.uploadForm__video > .MuiCircularProgress-root {
+	border-radius: 5px;
+	stroke-linecap: round;
+}
+
+.uploadForm__video > .MuiCircularProgress-circle {
+	border-radius: 5px;
+	stroke-linecap: round;
+}
+
+.uploadForm__video > .MuiBox-root-2 {
+	font-weight: 500;
+}
+
+.uploadForm__video > .MuiCircularProgress-colorPrimary {
+	color: #065fd4;
+}

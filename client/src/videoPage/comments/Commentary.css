@@ -1,0 +1,110 @@
+.commentary__container {
+	display: flex;
+	width: 100%;
+	margin-bottom: 16px;
+	flex-direction: column;
+}
+
+.commentary__main {
+	display: flex;
+}
+
+.commentary__avatar {
+	margin-right: 16px;
+}
+
+.commentary__details {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.commentary__info {
+	display: flex;
+	margin-bottom: 2px;
+}
+
+.commentary__user {
+	font-size: 13px;
+	font-weight: bold;
+	margin: 0 4px 2px 0;
+}
+
+.commentary__date {
+	font-size: 13px;
+	color: #aaaaaa;
+}
+
+.commentary__content {
+	font-size: 14px;
+	margin-top: 4px;
+}
+
+.commentary__actions {
+	display: flex;
+	margin: 12px 0;
+}
+
+.commentary__handsLikes {
+	display: flex;
+	/* border-bottom: 2px solid #aaaaaa; */
+	/* margin-left: 12px; */
+	height: 16px;
+	/* cursor: pointer; */
+	color: #aaaaaa;
+}
+
+.commentary__likes,
+.commentary__dislikes {
+	display: flex;
+	align-items: center;
+	/* margin-right: 12px; */
+}
+
+.commentary__dislikes {
+	margin-right: 12px;
+}
+
+.commentary__likes > p,
+.commentary__dislikes > p {
+	font-size: 13px;
+	margin: 0 8px;
+	/* margin-left: 12px; */
+}
+
+.commentary__likes > .MuiSvgIcon-root,
+.commentary__dislikes > .MuiSvgIcon-root {
+	height: 16px;
+	width: 16px;
+	cursor: pointer;
+}
+
+.commentary__blue {
+	color: #3ea6ff;
+}
+
+.commentary__replyButton {
+	cursor: pointer;
+	font-size: 13px;
+	color: #aaaaaa;
+	/* margin-top: 8px; */
+	font-weight: 500;
+}
+
+.commentary__replySection {
+	margin-left: 50px;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.commentary__showMore {
+	display: flex;
+	align-items: center;
+	font-weight: 500;
+	color: #3ea6ff;
+	margin-bottom: 12px;
+}
+
+.commentary__hideReplies {
+	display: none;
+}
