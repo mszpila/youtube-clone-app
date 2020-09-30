@@ -11,4 +11,4 @@ To fix:
 - video player could have more features
 - video could have more quality versions
 
-Video example with comments and replies:http://youtube-clone--app.herokuapp.com/video/5f746d42cd33f90017a2079d
+Video example with comments and replies:https://youtube-clone--app.herokuapp.com/video/5f746d42cd33f90017a2079d
