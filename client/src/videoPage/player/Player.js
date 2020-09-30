@@ -204,7 +204,7 @@ function Player({ url }) {
 
 	return (
 		<>
-			<Container maxWidth="md">
+			<Container>
 				<div
 					onMouseMove={handleMouseMove}
 					onMouseLeave={hanldeMouseLeave}
