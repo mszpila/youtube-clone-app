@@ -113,7 +113,7 @@ function EditPage({
 					</button>
 				</form>
 				<div className="uploadForm__video">
-					<Player url={`/${url}`} />
+					<Player url={`${url}`} />
 				</div>
 			</div>
 			<Popover

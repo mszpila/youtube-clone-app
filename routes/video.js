@@ -9,6 +9,13 @@ const ffmpeg = require("fluent-ffmpeg");
 const fs = require("fs");
 const path = require("path");
 const Visitor = require("../model/Visitor");
+const AWS = require("aws-sdk");
+var S3 = require("aws-sdk/clients/s3");
+
+const s3 = new AWS.S3({
+	accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+	secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
 
 // Set storage
 let storage = multer.diskStorage({
@@ -68,22 +75,27 @@ const createPreview = (
 			0.25 * safeVideoDurationInSeconds,
 			0.5 * safeVideoDurationInSeconds
 		);
-		return ffmpeg()
-			.input(inputPath)
-			.inputOptions([`-ss ${startPreviewInSec}`])
-			.outputOptions([`-t ${previewDurationInSec}`])
-			.noAudio()
-			.size("1920x1080")
-			.format("gif")
-			.outputOption(["-loop -1"])
-			.output(outputPath)
-			.on("end", function () {
-				resolve(outputPath);
-			})
-			.on("error", function () {
-				reject("Cannot create the preview");
-			})
-			.run();
+		return (
+			ffmpeg()
+				.input(inputPath)
+				.inputOptions([`-ss ${startPreviewInSec}`])
+				.outputOptions([`-t ${previewDurationInSec}`])
+				.noAudio()
+				.size("1280x720")
+				// .complexFilter(
+				// 	"[0:v] split [a][b];[a] palettegen [p];[b][p] paletteuse"
+				// )
+				.format("gif")
+				.outputOption(["-loop -1"])
+				.output(outputPath)
+				.on("end", function () {
+					resolve(outputPath);
+				})
+				.on("error", function () {
+					reject("Cannot create the preview");
+				})
+				.run()
+		);
 	});
 };
 
@@ -121,7 +133,6 @@ const createThumbnails = (inputPath, outputPath, customFilename) => {
 		let thumbsPath = [];
 		return ffmpeg()
 			.input(inputPath)
-			.format("gif")
 			.on("filenames", function (filenames) {
 				thumbsPath = filenames.map((item) => `${outputPath}/${item}`);
 			})
@@ -133,8 +144,8 @@ const createThumbnails = (inputPath, outputPath, customFilename) => {
 				// Will take screens at 20%, 40%, 60% and 80% of the video
 				count: 1,
 				folder: outputPath,
-				filename: `${customFilename}.gif`,
-				size: "1920x1080",
+				filename: `${customFilename}.png`,
+				size: "1280x720",
 			});
 	});
 };
@@ -151,7 +162,7 @@ const createXFramesPreview = (
 				.input(framesPath)
 				// .addInput(thumbnailPath)
 				// .input(thumbnailPath)
-				.size("1920x1080")
+				.size("1280x720")
 				.format("gif")
 				.inputFPS(2.5)
 				.outputOption(["-loop -1"])
@@ -225,13 +236,94 @@ router.post("/upload", auth, upload.single("video"), async (req, res) => {
 	// 	);
 	// }
 
+	// Setting up S3 upload parameters
+	const paramsVideo = {
+		Bucket: `${process.env.S3_BUCKET_NAME}/public/uploads/videos`,
+		Key: `${customFilename}.mp4`, // File name you want to save as in S3
+		// Body: `public/uploads/videos/${customFilename}.gif`,
+		Body: fs.readFileSync(
+			path.join(`public/uploads/videos/${customFilename}.mp4`)
+		),
+	};
+
+	const paramsThumbnail = {
+		Bucket: `${process.env.S3_BUCKET_NAME}/public/uploads/thumbnails`,
+		Key: `${customFilename}.png`, // File name you want to save as in S3
+		// Body: `public/uploads/thumbnails/${customFilename}.png`,
+		Body: fs.readFileSync(
+			path.join(`public/uploads/thumbnails/${customFilename}.png`)
+		),
+	};
+
+	const paramsPreview = {
+		Bucket: `${process.env.S3_BUCKET_NAME}/public/uploads/previews`,
+		Key: `${customFilename}.gif`, // File name you want to save as in S3
+		// Body: `public/uploads/previews/${customFilename}.gif`,
+		Body: fs.readFileSync(
+			path.join(`public/uploads/previews/${customFilename}.gif`)
+		),
+	};
+
+	const videoUpload = () => {
+		return new Promise((resolve) => {
+			s3.upload(paramsVideo, function (err, data) {
+				if (err) {
+					throw err;
+				}
+				// console.log(`File uploaded successfully. ${data.Location}`);
+				resolve(data.Location);
+			});
+		});
+	};
+
+	const video_url = await videoUpload();
+
+	const thumbnailUpload = () => {
+		return new Promise((resolve) => {
+			s3.upload(paramsThumbnail, function (err, data) {
+				if (err) {
+					throw err;
+				}
+				// console.log(`File uploaded successfully. ${data.Location}`);
+				resolve(data.Location);
+			});
+		});
+	};
+
+	const thumbnail_url = await thumbnailUpload();
+
+	const previewUpload = () => {
+		return new Promise((resolve) => {
+			s3.upload(paramsPreview, function (err, data) {
+				if (err) {
+					throw err;
+				}
+				// console.log(`File uploaded successfully. ${data.Location}`);
+				resolve(data.Location);
+			});
+		});
+	};
+
+	const preview_url = await previewUpload();
+
+	// Uploading files to the bucket
+	// s3.upload(params, function(err, data) {
+	// 	if (err) {
+	// 		throw err;
+	// 	}
+	// 	console.log(`File uploaded successfully. ${data.Location}`);
+	// });
+
 	let video = new Video({
 		user: req.user.id,
 		title: customFilename,
 		urls: {
-			video_url: req.file.path.replace(/\\/g, "/"),
-			thumbnail_url: thumbs[0],
-			preview_url: preview,
+			// video_url: req.file.path.replace(/\\/g, "/"),
+			// thumbnail_url: thumbs[0],
+			// preview_url: preview,
+			video_url,
+			thumbnail_url,
+			preview_url,
 		},
 		duration,
 	});
@@ -245,9 +337,11 @@ router.post("/upload", auth, upload.single("video"), async (req, res) => {
 		},
 		function (err) {
 			if (err) console.error(err);
-			return res.json({ success: true, video });
+			return res.json(video);
 		}
 	);
+
+	// res.status(200).json(video);
 });
 
 router.get("/getVideos", (req, res) => {
@@ -509,28 +603,89 @@ router.post("/remove", auth, async (req, res) => {
 	// if (id !== req.user.id) {
 	// 	res.status(401).json("you don't own this video");
 	// }
-	const video = await Video.findById(id).select("urls");
-	let files = [];
-	files.push(video.urls.video_url);
-	files.push(video.urls.thumbnail_url);
-	files.push(video.urls.preview_url);
 
-	files.forEach((file) => {
-		fs.unlink(path.join(file), function (err) {
-			if (err && err.code == "ENOENT") {
-				// file doens't exist
-				// console.info("File doesn't exist, won't remove it.");
-				// return res.json(err);
-			} else if (err) {
-				// other errors, e.g. maybe we don't have enough permission
-				// console.error("Error occurred while trying to remove file");
-				// return res.json(err);
-			}
-			// else {
-			// 	console.info(`removed`);
-			// }
+	const video = await Video.findById(id).select("urls");
+	// console.log("video", `${video.urls.video_url.split("/").slice(-1)[0]}`);
+
+	// Setting up S3 upload parameters
+	const paramsVideo = {
+		Bucket: `${process.env.S3_BUCKET_NAME}/public/uploads/videos`,
+		Key: `${video.urls.video_url.split("/").slice(-1)[0]}`, // File name you want to save as in S3
+	};
+
+	const paramsThumbnail = {
+		Bucket: `${process.env.S3_BUCKET_NAME}/public/uploads/thumbnails`,
+		Key: `${video.urls.thumbnail_url.split("/").slice(-1)[0]}`, // File name you want to save as in S3
+	};
+
+	const paramsPreview = {
+		Bucket: `${process.env.S3_BUCKET_NAME}/public/uploads/previews`,
+		Key: `${video.urls.preview_url.split("/")[-1]}`, // File name you want to save as in S3
+	};
+
+	// let files = [];
+	// files.push(video.urls.video_url);
+	// files.push(video.urls.thumbnail_url);
+	// files.push(video.urls.preview_url);
+
+	// files.forEach((file) => {
+	// 	fs.unlink(path.join(file), function (err) {
+	// 		if (err && err.code == "ENOENT") {
+	// 			// file doens't exist
+	// 			// console.info("File doesn't exist, won't remove it.");
+	// 			// return res.json(err);
+	// 		} else if (err) {
+	// 			// other errors, e.g. maybe we don't have enough permission
+	// 			// console.error("Error occurred while trying to remove file");
+	// 			// return res.json(err);
+	// 		}
+	// 		// else {
+	// 		// 	console.info(`removed`);
+	// 		// }
+	// 	});
+	// });
+	const videoDelete = () => {
+		return new Promise((resolve) => {
+			s3.deleteObject(paramsVideo, function (err, data) {
+				if (err) {
+					throw err;
+				}
+				// console.log(`File uploaded successfully. ${data.Location}`);
+				resolve(data.Deleted);
+			});
 		});
-	});
+	};
+
+	const videoResult = await videoDelete();
+
+	const thumbnailDelete = () => {
+		return new Promise((resolve) => {
+			s3.deleteObject(paramsThumbnail, function (err, data) {
+				if (err) {
+					throw err;
+				}
+				// console.log(`File uploaded successfully. ${data.Location}`);
+				resolve(data.Deleted);
+			});
+		});
+	};
+
+	const thumbnailResult = await thumbnailDelete();
+
+	const previewDelete = () => {
+		return new Promise((resolve) => {
+			s3.deleteObject(paramsPreview, function (err, data) {
+				if (err) {
+					throw err;
+				}
+				// console.log(`File uploaded successfully. ${data.Location}`);
+				resolve(data.Deleted);
+			});
+		});
+	};
+
+	const previewResult = await previewDelete();
+
 	Video.findByIdAndDelete(id, (err, deletedVideo) => {
 		if (err) return res.json(err);
 		Commentary.deleteMany({ videoId: id }, (err, deletedComments) => {
@@ -538,6 +693,7 @@ router.post("/remove", auth, async (req, res) => {
 			res.status(200).json(true);
 		});
 	});
+	// res.status(200).json(videoResult, thumbnailResult, previewResult);
 });
 
 router.post("/addView", async (req, res) => {

@@ -75,6 +75,7 @@ function UploadPage() {
 		axios
 			.get("/api/user/me/")
 			.then((response) => {
+				console.log("/api/user/me 1", response);
 				dispatch(setLoginState(true));
 				dispatch(saveUser(response.data));
 			})
@@ -117,10 +118,12 @@ function UploadPage() {
 			},
 		};
 		formData.append("video", files[0]);
+		console.log("formData append video");
 		axios
 			.post("/api/video/upload", formData, config)
 			.then((response) => {
-				setVideo(response.data.video);
+				console.log("response on upload", response.data);
+				setVideo(response.data);
 			})
 			.catch((err) => console.error(err.data));
 	};

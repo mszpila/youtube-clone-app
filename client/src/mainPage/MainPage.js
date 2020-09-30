@@ -89,8 +89,8 @@ function MainPage() {
 						className="mainPage__link"
 					>
 						<VideoCard
-							thumbnail={`/${video.urls?.thumbnail_url}`}
-							preview={`/${video.urls?.preview_url}`}
+							thumbnail={`${video.urls?.thumbnail_url}`}
+							preview={`${video.urls?.preview_url}`}
 							title={video.title}
 							user={video.user?.username}
 							views={`${video.views} views`}

@@ -254,7 +254,7 @@ function VideoPage() {
 				></div>
 			) : null}
 			<div className="videoPage__main">
-				<Player url={video && `/${video.urls?.video_url}`} />
+				<Player url={video && `${video.urls?.video_url}`} />
 				<div className="videoPage__videoDetails">
 					<div className="videoPage__firstSection">
 						<div className="videoPage__text">

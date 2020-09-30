@@ -188,7 +188,7 @@ function UploadForm({
 				{/* if progress is 100 and there is not video yet change it to circular */}
 				<div className="uploadForm__video">
 					{video ? (
-						<Player url={`/${video.urls?.video_url}`} />
+						<Player url={`${video.urls?.video_url}`} />
 					) : progress === 100 ? (
 						<FacebookCircularProgress />
 					) : (

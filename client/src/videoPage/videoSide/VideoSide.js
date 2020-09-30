@@ -79,8 +79,8 @@ function VideoSide() {
 					className="videoSide__link"
 				>
 					<VideoSmallRow
-						thumbnail={`/${video.urls?.thumbnail_url}`}
-						preview={`/${video.urls?.preview_url}`}
+						thumbnail={`${video.urls?.thumbnail_url}`}
+						preview={`${video.urls?.preview_url}`}
 						title={video.title}
 						user={video.user?.username}
 						views={`${video.views} views`}
