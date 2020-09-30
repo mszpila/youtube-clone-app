@@ -10,5 +10,6 @@ To fix:
 - make video player downloads only needed chunk of the file instead of waiting to download the whole file
 - video player could have more features
 - video could have more quality versions
+- app rolls the dice and sometimes the source of the img is correct and sometimes it adds / to the src what makes the app unable to load assets
 
 Video example with comments and replies:https://youtube-clone--app.herokuapp.com/video/5f746d42cd33f90017a2079d
