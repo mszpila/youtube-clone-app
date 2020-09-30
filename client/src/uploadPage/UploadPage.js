@@ -118,11 +118,9 @@ function UploadPage() {
 			},
 		};
 		formData.append("video", files[0]);
-		console.log("formData append video");
 		axios
 			.post("/api/video/upload", formData, config)
 			.then((response) => {
-				console.log("response on upload", response.data);
 				setVideo(response.data);
 			})
 			.catch((err) => console.error(err.data));
