@@ -69,5 +69,4 @@ const UserSchema = mongoose.Schema({
 	reactions: [ReactionSchema],
 });
 
-// export model user with UserSchema
 module.exports = mongoose.model("user", UserSchema);

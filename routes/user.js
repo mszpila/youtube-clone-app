@@ -1,228 +1,66 @@
 const express = require("express");
-const { check, validationResult } = require("express-validator");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const router = express.Router();
 const auth = require("../middleware/auth");
-const mongoose = require("mongoose");
+const UserService = require("../libs/user/index");
 
-const User = require("../model/User");
-const Video = require("../model/Video");
-const Commentary = require("../model/Comment");
-const { route } = require("./video");
-
-/**
- * @method - POST
- * @param - /signup
- * @description - User SignUp
- */
-
-router.post("/signup", async (req, res) => {
-	const errors = validationResult(req);
-	if (!errors.isEmpty()) {
-		return res.status(400).json({
-			errors: errors.array(),
-		});
-	}
-
-	const { username, email, password } = req.body;
+router.post("/signup", async (req, res, next) => {
 	try {
-		let user = await User.findOne({
-			username,
-		});
-		if (user) {
-			return res.status(400).json({
-				message: "Username already used",
-			});
-		}
-
-		user = await User.findOne({
-			email,
-		});
-		if (user) {
-			return res.status(400).json({
-				message: "Email already used",
-			});
-		}
-
-		user = new User({
-			username,
-			email,
-			password,
-		});
-
-		const salt = await bcrypt.genSalt(10);
-		user.password = await bcrypt.hash(password, salt);
-
-		await user.save();
-
-		const payload = {
-			user: {
-				id: user.id,
-			},
-		};
-
-		jwt.sign(
-			payload,
-			"randomString",
-			{
-				expiresIn: 3600,
-			},
-			(err, token) => {
-				if (err) throw err;
-				res.status(200)
-					.cookie("login_auth", token, { httpOnly: true })
-					.json({
-						token,
-						user,
-					});
-			}
-		);
+		await UserService.registerUser(req, res, next);
 	} catch (err) {
-		// console.log(err.message);
-		res.status(500).json({ message: "Error in Saving" });
+		next(err);
 	}
 });
 
-router.post("/login", async (req, res) => {
-	const errors = validationResult(req);
-
-	if (!errors.isEmpty()) {
-		return res.status(400).json({
-			errors: errors.array(),
-		});
-	}
-
-	const { email, password } = req.body;
+router.post("/login", async (req, res, next) => {
 	try {
-		let user = await User.findOne({
-			email,
-		});
-		if (!user)
-			return res.status(400).json({
-				message: "User Not Exist",
-			});
-
-		const isMatch = await bcrypt.compare(password, user.password);
-		if (!isMatch)
-			return res.status(400).json({
-				message: "Incorrect Password!",
-			});
-
-		const payload = {
-			user: {
-				id: user.id,
-			},
-		};
-
-		jwt.sign(
-			payload,
-			"randomString",
-			{
-				expiresIn: 3600,
-				// expiresIn: 10,
-			},
-			(err, token) => {
-				if (err) throw err;
-				res.status(200)
-					.cookie("login_auth", token, { httpOnly: true })
-					.json({
-						token,
-						user,
-					});
-			}
-		);
-	} catch (e) {
-		console.error(e);
-		res.status(500).json({
-			message: "Server Error",
-		});
+		await UserService.loginUser(req, res, next);
+	} catch (err) {
+		next(err);
 	}
 });
 
-router.post("/logout", auth, async (req, res) => {
-	res.clearCookie("login_auth", { httpOnly: true }).json({ success: true });
-});
-
-router.get("/me", auth, async (req, res) => {
+router.post("/logout", auth, async (req, res, next) => {
 	try {
-		const user = await User.findById(req.user.id);
-		const payload = {
-			user: {
-				id: user.id,
-			},
-		};
-
-		jwt.sign(
-			payload,
-			"randomString",
-			{
-				expiresIn: 3600,
-				// expiresIn: 10,
-			},
-			(err, token) => {
-				if (err) throw err;
-				res.status(200)
-					.cookie("login_auth", token, { httpOnly: true })
-					.json(user);
-			}
-		);
-	} catch (e) {
-		res.send({ message: "Error in Fetching user" });
+		await UserService.logoutUser(req, res);
+	} catch (err) {
+		next(err);
 	}
 });
 
-router.get("/me/subscriptions", auth, (req, res) => {
-	User.findById(req.user.id)
-		.select("subscriptions")
-		.populate("subscriptions")
-		.exec((err, subscriptions) => {
-			if (err) res.send(err);
-			res.status(200).json(subscriptions);
-		});
-});
-
-router.get("/me/subscribe", auth, async (req, res) => {
-	const { user_id } = req.query;
-	await User.findById(req.user.id)
-		.where("subscriptions")
-		.in([user_id])
-		.exec((err, result) => {
-			if (err) res.status(400).json({ success: false, err });
-			if (result)
-				res.status(200).json({ success: true, follow: true, result });
-			else res.status(200).json({ success: true, follow: false, result });
-		});
-});
-
-router.post("/me/subscribe", auth, async (req, res) => {
-	const { user_id } = req.body;
-	const followed = await User.findById(req.user.id)
-		.where("subscriptions")
-		.in([user_id]);
-	if (followed) {
-		await User.findByIdAndUpdate(req.user.id, {
-			$pull: { subscriptions: user_id },
-		});
-		await User.findByIdAndUpdate(user_id, {
-			$inc: { subscribers: -1 },
-		});
-	} else {
-		await User.findByIdAndUpdate(req.user.id, {
-			$addToSet: { subscriptions: user_id },
-		});
-		await User.findByIdAndUpdate(user_id, {
-			$inc: { subscribers: 1 },
-		});
+router.get("/me", auth, async (req, res, next) => {
+	try {
+		await UserService.getUser(req, res, next);
+	} catch (err) {
+		next(err);
 	}
-	return res.status(200).json({ success: true });
 });
 
-router.get("/getUserById", (req, res) => {
-	User.findById(req.query.id, (err, user) => {
-		if (err) res.status(400).send(err);
-		res.status(200).json({ success: true, user });
-	});
+router.get("/me/subscriptions", auth, async (req, res, next) => {
+	try {
+		await UserService.userSubscriptions(req, res, next);
+	} catch (err) {
+		next(err);
+	}
+});
+
+router.get("/me/subscribe", auth, async (req, res, next) => {
+	try {
+		await UserService.getSubscribeState(req, res, next);
+	} catch (err) {
+		next(err);
+	}
+});
+
+router.post("/me/subscribe", auth, async (req, res, next) => {
+	try {
+		await UserService.postSubscribeState(req, res, next);
+	} catch (err) {
+		next(err);
+	}
+});
+
+router.get("/getUserById", (req, res, next) => {
+	UserService.getUserById(req, res, next);
 });
 
 router.get("/reactionVideo", auth, async (req, res) => {

@@ -25,6 +25,10 @@ app.use("/api/video", video);
 app.use("/api/comment", comment);
 app.use("/api/search", search);
 
+app.use((err, req, res, next) => {
+	res.status(500).json({ message: "Server error", error: err.message });
+});
+
 app.get("*", (req, res) => {
 	res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
