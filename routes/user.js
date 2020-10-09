@@ -3,7 +3,7 @@ const router = express.Router();
 const auth = require("../middleware/auth");
 const UserService = require("../libs/user/index");
 
-router.post("/signup", async (req, res, next) => {
+router.post("/register", async (req, res, next) => {
 	const { username, email, password } = req.body;
 	try {
 		const user = await UserService.registerUser(username, email, password);

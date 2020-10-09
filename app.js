@@ -20,9 +20,9 @@ app.get("/api", (req, res) => {
 	res.json({ message: "API Working" });
 });
 
-app.use("/api/user", user);
-app.use("/api/video", video);
-app.use("/api/comment", comment);
+app.use("/api/users", user);
+app.use("/api/videos", video);
+app.use("/api/comments", comment);
 app.use("/api/search", search);
 
 app.use((err, req, res, next) => {

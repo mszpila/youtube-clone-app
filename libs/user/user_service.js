@@ -8,10 +8,11 @@ const createToken = (user) => {
 		{
 			expiresIn: 3600,
 		},
-		(err, token) => {
-			if (err) {
-				let err = new Error("Could not create token");
+		(error, token) => {
+			if (error) {
+				let err = new Error("Could not create token", error);
 				err.statusCode = 500;
+				throw err;
 			} else {
 				return token;
 			}
@@ -28,6 +29,7 @@ const registerUser = (User) => async (username, email, password) => {
 	if (user) {
 		let err = new Error("Username already used");
 		err.statusCode = 400;
+		throw err;
 	}
 
 	// cheking email
@@ -37,6 +39,7 @@ const registerUser = (User) => async (username, email, password) => {
 	if (user) {
 		let err = new Error("Email already used");
 		err.statusCode = 400;
+		throw err;
 	}
 
 	// creating user object
@@ -63,6 +66,7 @@ const loginUser = (User) => async (login, password) => {
 	if (!user) {
 		let err = new Error("Wrong credentials");
 		err.statusCode = 400;
+		throw err;
 	}
 
 	// checking password
@@ -70,6 +74,7 @@ const loginUser = (User) => async (login, password) => {
 	if (!isMatch) {
 		let err = new Error("Wrong credentials");
 		err.statusCode = 400;
+		throw err;
 	} else {
 		return user;
 	}
@@ -80,6 +85,7 @@ const getUser = (User) => async (id) => {
 	if (!user) {
 		let err = new Error("Wrong credentials");
 		err.statusCode = 400;
+		throw err;
 	} else {
 		return user;
 	}
@@ -91,8 +97,9 @@ const userSubscriptions = (User) => async (id) => {
 		.populate("subscriptions")
 		.exec((error, subscriptions) => {
 			if (error) {
-				let err = new Error("Cannot perform action", error);
+				let err = new Error("Cannot get subscriptions", error);
 				err.statusCode = 500;
+				throw err;
 			} else {
 				return subscriptions;
 			}
@@ -105,8 +112,9 @@ const getSubscribeState = (User) => async (id, channel_id) => {
 		.in([channel_id])
 		.exec((error, result) => {
 			if (error) {
-				let err = new Error("Cannot perform action", error);
+				let err = new Error("Cannot get subscribe state", error);
 				err.statusCode = 500;
+				throw err;
 			} else if (result) {
 				return true;
 			} else {
@@ -125,8 +133,9 @@ const postSubscribeState = (User) => async (id, channel_id) => {
 			$inc: { subscribers: -1 },
 		}).exec((error, user) => {
 			if (error) {
-				let err = new Error("Cannot perform action", error);
+				let err = new Error("Cannot post subscribe state", error);
 				err.statusCode = 500;
+				throw err;
 			} else {
 				return user;
 			}
@@ -137,8 +146,9 @@ const postSubscribeState = (User) => async (id, channel_id) => {
 			$inc: { subscribers: 1 },
 		}).exec((error, user) => {
 			if (error) {
-				let err = new Error("Cannot perform action", error);
+				let err = new Error("Cannot post subscribe state", error);
 				err.statusCode = 500;
+				throw err;
 			} else {
 				return user;
 			}
@@ -149,8 +159,9 @@ const postSubscribeState = (User) => async (id, channel_id) => {
 const getUserById = (User) => async (id) => {
 	User.findById(id, (error, user) => {
 		if (error) {
-			let err = new Error("Cannot perform action", error);
+			let err = new Error("Cannot get the user", error);
 			err.statusCode = 500;
+			throw err;
 		} else {
 			return user;
 		}

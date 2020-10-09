@@ -5,6 +5,9 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "jest",
+		"test:app": "jest --testPathPattern app_test",
+		"test:sevice": "jest --testPathPattern service_test",
+		"test:model": "jest --testPathPattern model_test",
 		"build": "cd client && npm install && npm run build",
 		"start": "node index.js"
 	},
@@ -26,6 +29,8 @@
 		"path": "^0.12.7"
 	},
 	"devDependencies": {
-		"nodemon": "2.0.4"
+		"nodemon": "2.0.4",
+		"sinon": "^9.2.0",
+		"supertest": "^5.0.0"
 	}
 }
