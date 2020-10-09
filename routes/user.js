@@ -4,32 +4,42 @@ const auth = require("../middleware/auth");
 const UserService = require("../libs/user/index");
 
 router.post("/signup", async (req, res, next) => {
+	const { username, email, password } = req.body;
 	try {
-		await UserService.registerUser(req, res, next);
+		const user = await UserService.registerUser(username, email, password);
+		const token = UserService.createToken(user);
+		res.status(200)
+			.cookie("login_auth", token, { httpOnly: true })
+			.json(token, user);
 	} catch (err) {
 		next(err);
 	}
 });
 
 router.post("/login", async (req, res, next) => {
+	const { login, password } = req.body;
 	try {
-		await UserService.loginUser(req, res, next);
+		const user = await UserService.loginUser(login, password);
+		const token = UserService.createToken(user);
+		res.status(200)
+			.cookie("login_auth", token, { httpOnly: true })
+			.json(token, user);
 	} catch (err) {
 		next(err);
 	}
 });
 
-router.post("/logout", auth, async (req, res, next) => {
-	try {
-		await UserService.logoutUser(req, res);
-	} catch (err) {
-		next(err);
-	}
+router.delete("/logout", auth, async (req, res, next) => {
+	res.clearCookie("login_auth", { httpOnly: true }).status(200).json(true);
 });
 
 router.get("/me", auth, async (req, res, next) => {
 	try {
-		await UserService.getUser(req, res, next);
+		const user = await UserService.getUser(req.user.id);
+		const token = UserService.createToken(user);
+		res.status(200)
+			.cookie("login_auth", token, { httpOnly: true })
+			.json(token, user);
 	} catch (err) {
 		next(err);
 	}
@@ -37,186 +47,100 @@ router.get("/me", auth, async (req, res, next) => {
 
 router.get("/me/subscriptions", auth, async (req, res, next) => {
 	try {
-		await UserService.userSubscriptions(req, res, next);
+		const subscriptions = await UserService.userSubscriptions(req.user.id);
+		res.status(200).json(subscriptions);
 	} catch (err) {
 		next(err);
 	}
 });
 
 router.get("/me/subscribe", auth, async (req, res, next) => {
+	const { channel_id } = req.query;
 	try {
-		await UserService.getSubscribeState(req, res, next);
+		const state = await UserService.getSubscribeState(
+			req.user.id,
+			channel_id
+		);
+		res.status(200).json(state);
 	} catch (err) {
 		next(err);
 	}
 });
 
 router.post("/me/subscribe", auth, async (req, res, next) => {
+	const { channel_id } = req.body;
 	try {
-		await UserService.postSubscribeState(req, res, next);
+		const user = await UserService.postSubscribeState(
+			req.user.id,
+			channel_id
+		);
+		res.status(200).json(user);
 	} catch (err) {
 		next(err);
 	}
 });
 
-router.get("/getUserById", (req, res, next) => {
-	UserService.getUserById(req, res, next);
+router.get("/getUserById", async (req, res, next) => {
+	const { id } = req.query;
+	try {
+		const user = await UserService.getUserById(id);
+		res.status(200).json(user);
+	} catch (err) {
+		next(err);
+	}
 });
 
-router.get("/reactionVideo", auth, async (req, res) => {
+router.get("/reactionVideo", auth, async (req, res, next) => {
 	const { videoContext } = req.query;
-	const reaction = await User.findById(req.user.id).select({
-		reactions: { $elemMatch: { videoContext } },
-	});
-	if (reaction.reactions.length) {
-		const state = reaction.reactions[0].state;
-		res.status(200).json({ success: true, state });
-	} else {
-		const state = null;
-		res.status(200).json({ success: true, state });
+	try {
+		const state = await UserService.getVideoReaction(
+			req.user.id,
+			videoContext
+		);
+		res.status(200).json(state);
+	} catch (err) {
+		next(err);
 	}
 });
 
-router.get("/reactionComment", auth, async (req, res) => {
+router.get("/reactionComment", auth, async (req, res, next) => {
 	const { commentContext } = req.query;
-	const reaction = await User.findById(req.user.id).select({
-		reactions: { $elemMatch: { commentContext } },
-	});
-	if (reaction.reactions.length) {
-		const state = reaction.reactions[0].state;
+	try {
+		const state = await UserService.getCommentReaction(
+			req.user.id,
+			commentContext
+		);
 		res.status(200).json(state);
-	} else {
-		const state = null;
-		res.status(200).json(state);
+	} catch (err) {
+		next(err);
 	}
 });
 
-router.post("/reactionVideo", auth, async (req, res) => {
+router.post("/reactionVideo", auth, async (req, res, next) => {
 	const { video_id, state } = req.body;
-	const reaction = await User.findById(req.user.id).select({
-		reactions: { $elemMatch: { videoContext: video_id } },
-	});
-
-	if (reaction.reactions.length) {
-		// already reacted ==> modify state
-		const currentState = reaction.reactions[0].state;
-		if (state === currentState) {
-			// user what to remove the reaction
-			await User.findByIdAndUpdate(
-				{ _id: req.user.id },
-				{
-					$pull: { reactions: { videoContext: video_id } },
-				}
-			);
-			// decrease amount of the item likes/dislikes
-			if (state === false) {
-				await Video.findByIdAndUpdate(video_id, {
-					$inc: { dislikes: -1 },
-				});
-			} else {
-				await Video.findByIdAndUpdate(video_id, {
-					$inc: { likes: -1 },
-				});
-			}
-			return res.status(200).json({ success: true, message: "pulled" });
-		} else {
-			// user wants to change reaction
-			await User.updateOne(
-				{ _id: req.user.id, "reactions.videoContext": video_id },
-				{ $set: { "reactions.$.state": state } }
-			);
-			if (state === false) {
-				await Video.findByIdAndUpdate(video_id, {
-					$inc: { dislikes: 1, likes: -1 },
-				});
-			} else {
-				await Video.findByIdAndUpdate(video_id, {
-					$inc: { likes: 1, dislikes: -1 },
-				});
-			}
-			return res.status(200).json({ success: true, message: "switched" });
-		}
-	} else {
-		// user set reaction
-		const user = await User.findByIdAndUpdate(
-			{ _id: req.user.id },
-			{ $push: { reactions: { videoContext: video_id, state } } }
+	try {
+		const result = await UserService.postVideoReaction(
+			req.user.id,
+			video_id,
+			state
 		);
-		if (state === false) {
-			await Video.findByIdAndUpdate(video_id, {
-				$inc: { dislikes: 1 },
-			});
-		} else {
-			await Video.findByIdAndUpdate(video_id, {
-				$inc: { likes: 1 },
-			});
-		}
-		return res.status(200).json({ success: true, message: "pushed" });
+		res.status(200).json(result);
+	} catch (err) {
+		next(err);
 	}
 });
 
-router.post("/reactionComment", auth, async (req, res) => {
+router.post("/reactionComment", auth, async (req, res, next) => {
 	const { comment_id, state } = req.body;
-	const reaction = await User.findById(req.user.id).select({
-		reactions: { $elemMatch: { commentContext: comment_id } },
-	});
-
-	if (reaction.reactions.length) {
-		// modify state
-		const currentState = reaction.reactions[0].state;
-		if (state === currentState) {
-			await User.findByIdAndUpdate(
-				{ _id: req.user.id },
-				{
-					$pull: { reactions: { commentContext: comment_id } },
-				}
-			);
-			// decrease amount of the item likes/dislikes
-			if (state === false) {
-				await Commentary.findByIdAndUpdate(comment_id, {
-					$inc: { dislikes: -1 },
-				});
-			} else {
-				await Commentary.findByIdAndUpdate(comment_id, {
-					$inc: { likes: -1 },
-				});
-			}
-			return res
-				.status(200)
-				.json({ success: true, message: "pulled", document });
-		} else {
-			// user wants to change reaction
-			await User.updateOne(
-				{ _id: req.user.id, "reactions.commentContext": comment_id },
-				{ $set: { "reactions.$.state": state } }
-			);
-			if (state === false) {
-				await Commentary.findByIdAndUpdate(comment_id, {
-					$inc: { dislikes: 1, likes: -1 },
-				});
-			} else {
-				await Commentary.findByIdAndUpdate(comment_id, {
-					$inc: { likes: 1, dislikes: -1 },
-				});
-			}
-			return res.status(200).json({ success: true, message: "switched" });
-		}
-	} else {
-		// user set reaction
-		const user = await User.findByIdAndUpdate(
-			{ _id: req.user.id },
-			{ $push: { reactions: { commentContext: comment_id, state } } }
+	try {
+		const result = await UserService.postCommentReaction(
+			req.user.id,
+			comment_id,
+			state
 		);
-		if (state === false) {
-			await Commentary.findByIdAndUpdate(comment_id, {
-				$inc: { dislikes: 1 },
-			});
-		} else {
-			await Commentary.findByIdAndUpdate(comment_id, {
-				$inc: { likes: 1 },
-			});
-		}
-		return res.status(200).json({ success: true, message: "pushed" });
+		res.status(200).json(result);
+	} catch (err) {
+		next(err);
 	}
 });
 

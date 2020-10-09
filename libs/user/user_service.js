@@ -9,362 +9,300 @@ const createToken = (user) => {
 			expiresIn: 3600,
 		},
 		(err, token) => {
-			if (err)
-				return res
-					.status(500)
-					.json({ message: "Could not create token" });
-			return res
-				.status(200)
-				.cookie("login_auth", token, { httpOnly: true })
-				.json(token, user);
+			if (err) {
+				let err = new Error("Could not create token");
+				err.statusCode = 500;
+			} else {
+				return token;
+			}
 		}
 	);
 };
 
-const registerUser = (User) => async (req, res, next) => {
-	const { username, email, password } = req.body;
+const registerUser = (User) => async (username, email, password) => {
 	let user = null;
-	try {
-		// cheking username
-		user = await User.findOne({
-			username,
-		});
-		if (user) {
-			return res.status(400).json({
-				message: "Username already used",
-			});
-		}
-
-		// cheking email
-		user = await User.findOne({
-			email,
-		});
-		if (user) {
-			return res.status(400).json({
-				message: "Email already used",
-			});
-		}
-
-		// creating user object
-		user = new User({
-			username,
-			email,
-			password,
-		});
-
-		// hashing password
-		const salt = await bcrypt.genSalt(10);
-		user.password = await bcrypt.hash(password, salt);
-
-		// saving user in db
-		await user.save().exec((err) => {
-			return res
-				.status(500)
-				.json({ message: "Could not save user", err });
-		});
-
-		return createToken(user);
-	} catch (err) {
-		next(err);
+	// cheking username
+	user = await User.findOne({
+		username,
+	});
+	if (user) {
+		let err = new Error("Username already used");
+		err.statusCode = 400;
 	}
+
+	// cheking email
+	user = await User.findOne({
+		email,
+	});
+	if (user) {
+		let err = new Error("Email already used");
+		err.statusCode = 400;
+	}
+
+	// creating user object
+	user = new User({
+		username,
+		email,
+		password,
+	});
+
+	// hashing password
+	const salt = await bcrypt.genSalt(10);
+	user.password = await bcrypt.hash(password, salt);
+
+	// saving user in db
+	return await user.save();
 };
 
-const loginUser = (User) => async (req, res, next) => {
-	const { login, password } = req.body;
+const loginUser = (User) => async (login, password) => {
 	let user = null;
-	try {
-		// checking user
-		user = await User.findOne({
-			$or: [{ email: login }, { username: login }],
-		});
-		if (!user)
-			return res.status(400).json({
-				message: "Wrong credentials",
-			});
+	// checking user
+	user = await User.findOne({
+		$or: [{ email: login }, { username: login }],
+	});
+	if (!user) {
+		let err = new Error("Wrong credentials");
+		err.statusCode = 400;
+	}
 
-		// checking password
-		const isMatch = await bcrypt.compare(password, user.password);
-		if (!isMatch)
-			return res.status(400).json({
-				message: "Wrong credentials",
-			});
-
-		return createToken(user);
-	} catch (err) {
-		next(err);
+	// checking password
+	const isMatch = await bcrypt.compare(password, user.password);
+	if (!isMatch) {
+		let err = new Error("Wrong credentials");
+		err.statusCode = 400;
+	} else {
+		return user;
 	}
 };
 
-const logoutUser = (req, res) => {
-	return res
-		.clearCookie("login_auth", { httpOnly: true })
-		.status(200)
-		.json(true);
-};
-
-const getUser = (User) => async (req, res, next) => {
-	try {
-		const user = await User.findById(req.user.id);
-		if (!user)
-			return res.status(400).json({
-				message: "User not exists",
-			});
-
-		return createToken(user);
-	} catch (err) {
-		next(err);
+const getUser = (User) => async (id) => {
+	const user = await User.findById(id);
+	if (!user) {
+		let err = new Error("Wrong credentials");
+		err.statusCode = 400;
+	} else {
+		return user;
 	}
 };
 
-const userSubscriptions = (User) => async (req, res, next) => {
-	try {
-		User.findById(req.user.id)
-			.select("subscriptions")
-			.populate("subscriptions")
-			.exec((err, subscriptions) => {
-				if (err) return res.json(err);
-				return res.status(200).json(subscriptions);
-			});
-	} catch (err) {
-		next(err);
-	}
-};
-
-const getSubscribeState = (User) => async (req, res, next) => {
-	const { user_id } = req.query;
-	try {
-		User.findById(req.user.id)
-			.where("subscriptions")
-			.in([user_id])
-			.exec((err, result) => {
-				if (err) return res.status(400).json(err);
-				if (result) return res.status(200).json(true);
-				else return res.status(200).json(false);
-			});
-	} catch (err) {
-		next(err);
-	}
-};
-
-const postSubscribeState = (User) => async (req, res, next) => {
-	const { user_id } = req.body;
-	try {
-		const followed = await User.findById(req.user.id)
-			.where("subscriptions")
-			.in([user_id]);
-		if (followed) {
-			await User.findByIdAndUpdate(req.user.id, {
-				$pull: { subscriptions: user_id },
-				$inc: { subscribers: -1 },
-			}).exec((err, user) => {
-				if (err) return res.json(err);
-				return res.status(200).json(user);
-			});
-		} else {
-			await User.findByIdAndUpdate(req.user.id, {
-				$addToSet: { subscriptions: user_id },
-				$inc: { subscribers: 1 },
-			}).exec((err, user) => {
-				if (err) return res.json(err);
-				return res.status(200).json(user);
-			});
-		}
-	} catch (err) {
-		next(err);
-	}
-};
-
-const getUserById = (User) => async (req, res, next) => {
-	try {
-		User.findById(req.user.id, (err, user) => {
-			if (err) return res.status(400).json(err);
-			return res.status(200).json(user);
-		});
-	} catch (err) {
-		next(err);
-	}
-};
-
-const getVideoReaction = (User) => async (id, videoContext, req, res) => {
-	try {
-		const reaction = await User.findById(id).select({
-			reactions: { $elemMatch: { videoContext } },
-		});
-		if (reaction.reactions.length) {
-			const state = reaction.reactions[0].state;
-			return res.status(200).json(state);
-		} else {
-			return res.status(200).json(null);
-		}
-	} catch (err) {
-		return res.status(500).json({ message: "Server error", err });
-	}
-};
-
-const postVideoReaction = (User, Video) => async (
-	id,
-	videoContext,
-	state,
-	req,
-	res
-) => {
-	try {
-		const reaction = await User.findById(id).select({
-			reactions: { $elemMatch: { videoContext } },
-		});
-
-		if (reaction.reactions.length) {
-			// already reacted ==> modify state
-			const currentState = reaction.reactions[0].state;
-			if (state === currentState) {
-				// user what to remove the reaction
-				await User.findByIdAndUpdate(
-					{ _id: id },
-					{
-						$pull: { reactions: { videoContext } },
-					}
-				);
-				// decrease amount of the item likes/dislikes
-				if (state === false) {
-					await Video.findByIdAndUpdate(videoContext, {
-						$inc: { dislikes: -1 },
-					});
-				} else {
-					await Video.findByIdAndUpdate(videoContext, {
-						$inc: { likes: -1 },
-					});
-				}
-				return res
-					.status(200)
-					.json({ success: true, message: "pulled" });
+const userSubscriptions = (User) => async (id) => {
+	User.findById(id)
+		.select("subscriptions")
+		.populate("subscriptions")
+		.exec((error, subscriptions) => {
+			if (error) {
+				let err = new Error("Cannot perform action", error);
+				err.statusCode = 500;
 			} else {
-				// user wants to change reaction
-				await User.updateOne(
-					{ _id: id, "reactions.videoContext": videoContext },
-					{ $set: { "reactions.$.state": state } }
-				);
-				if (state === false) {
-					await Video.findByIdAndUpdate(videoContext, {
-						$inc: { dislikes: 1, likes: -1 },
-					});
-				} else {
-					await Video.findByIdAndUpdate(videoContext, {
-						$inc: { likes: 1, dislikes: -1 },
-					});
+				return subscriptions;
+			}
+		});
+};
+
+const getSubscribeState = (User) => async (id, channel_id) => {
+	User.findById(id)
+		.where("subscriptions")
+		.in([channel_id])
+		.exec((error, result) => {
+			if (error) {
+				let err = new Error("Cannot perform action", error);
+				err.statusCode = 500;
+			} else if (result) {
+				return true;
+			} else {
+				return false;
+			}
+		});
+};
+
+const postSubscribeState = (User) => async (id, channel_id) => {
+	const followed = await User.findById(id)
+		.where("subscriptions")
+		.in([channel_id]);
+	if (followed) {
+		await User.findByIdAndUpdate(id, {
+			$pull: { subscriptions: channel_id },
+			$inc: { subscribers: -1 },
+		}).exec((error, user) => {
+			if (error) {
+				let err = new Error("Cannot perform action", error);
+				err.statusCode = 500;
+			} else {
+				return user;
+			}
+		});
+	} else {
+		await User.findByIdAndUpdate(id, {
+			$addToSet: { subscriptions: channel_id },
+			$inc: { subscribers: 1 },
+		}).exec((error, user) => {
+			if (error) {
+				let err = new Error("Cannot perform action", error);
+				err.statusCode = 500;
+			} else {
+				return user;
+			}
+		});
+	}
+};
+
+const getUserById = (User) => async (id) => {
+	User.findById(id, (error, user) => {
+		if (error) {
+			let err = new Error("Cannot perform action", error);
+			err.statusCode = 500;
+		} else {
+			return user;
+		}
+	});
+};
+
+const getVideoReaction = (User) => async (id, videoContext) => {
+	const reaction = await User.findById(id).select({
+		reactions: { $elemMatch: { videoContext } },
+	});
+	if (reaction.reactions.length) {
+		const state = reaction.reactions[0].state;
+		return state;
+	} else {
+		return null;
+	}
+};
+
+const postVideoReaction = (User, Video) => async (id, videoContext, state) => {
+	const reaction = await User.findById(id).select({
+		reactions: { $elemMatch: { videoContext } },
+	});
+
+	if (reaction.reactions.length) {
+		// already reacted ==> modify state
+		const currentState = reaction.reactions[0].state;
+		if (state === currentState) {
+			// user what to remove the reaction
+			await User.findByIdAndUpdate(
+				{ _id: id },
+				{
+					$pull: { reactions: { videoContext } },
 				}
-				return res
-					.status(200)
-					.json({ success: true, message: "switched" });
+			);
+			// decrease amount of the item likes/dislikes
+			if (state === false) {
+				await Video.findByIdAndUpdate(videoContext, {
+					$inc: { dislikes: -1 },
+				});
+			} else {
+				await Video.findByIdAndUpdate(videoContext, {
+					$inc: { likes: -1 },
+				});
 			}
 		} else {
-			// user set reaction
-			const user = await User.findByIdAndUpdate(
-				{ _id: id },
-				{ $push: { reactions: { videoContext, state } } }
+			// user wants to change reaction
+			await User.updateOne(
+				{ _id: id, "reactions.videoContext": videoContext },
+				{ $set: { "reactions.$.state": state } }
 			);
 			if (state === false) {
 				await Video.findByIdAndUpdate(videoContext, {
-					$inc: { dislikes: 1 },
+					$inc: { dislikes: 1, likes: -1 },
 				});
 			} else {
 				await Video.findByIdAndUpdate(videoContext, {
-					$inc: { likes: 1 },
+					$inc: { likes: 1, dislikes: -1 },
 				});
 			}
-			return res.status(200).json({ success: true, message: "pushed" });
 		}
-	} catch (err) {
-		return res.status(500).json({ message: "Server error", err });
-	}
-};
-
-const getCommentReaction = (User) => async (id, commentContext, req, res) => {
-	try {
-		const reaction = await User.findById(id).select({
-			reactions: { $elemMatch: { commentContext } },
-		});
-		if (reaction.reactions.length) {
-			const state = reaction.reactions[0].state;
-			return res.status(200).json(state);
+	} else {
+		// user set reaction
+		const user = await User.findByIdAndUpdate(
+			{ _id: id },
+			{ $push: { reactions: { videoContext, state } } }
+		);
+		if (state === false) {
+			await Video.findByIdAndUpdate(videoContext, {
+				$inc: { dislikes: 1 },
+			});
 		} else {
-			return res.status(200).json(null);
+			await Video.findByIdAndUpdate(videoContext, {
+				$inc: { likes: 1 },
+			});
 		}
-	} catch (err) {
-		return res.status(500).json({ message: "Server error", err });
+	}
+	return true;
+};
+
+const getCommentReaction = (User) => async (id, commentContext) => {
+	const reaction = await User.findById(id).select({
+		reactions: { $elemMatch: { commentContext } },
+	});
+	if (reaction.reactions.length) {
+		const state = reaction.reactions[0].state;
+		return state;
+	} else {
+		return null;
 	}
 };
 
-const postCommentReaction = (User, {}, Commentary, req, res) => async (
+const postCommentReaction = (User, {}, Commentary) => async (
 	id,
 	commentContext
 ) => {
-	try {
-		const reaction = await User.findById(id).select({
-			reactions: { $elemMatch: { commentContext } },
-		});
+	const reaction = await User.findById(id).select({
+		reactions: { $elemMatch: { commentContext } },
+	});
 
-		if (reaction.reactions.length) {
-			// modify state
-			const currentState = reaction.reactions[0].state;
-			if (state === currentState) {
-				await User.findByIdAndUpdate(
-					{ _id: id },
-					{
-						$pull: { reactions: { commentContext } },
-					}
-				);
-				// decrease amount of the item likes/dislikes
-				if (state === false) {
-					await Commentary.findByIdAndUpdate(commentContext, {
-						$inc: { dislikes: -1 },
-					});
-				} else {
-					await Commentary.findByIdAndUpdate(commentContext, {
-						$inc: { likes: -1 },
-					});
+	if (reaction.reactions.length) {
+		// modify state
+		const currentState = reaction.reactions[0].state;
+		if (state === currentState) {
+			await User.findByIdAndUpdate(
+				{ _id: id },
+				{
+					$pull: { reactions: { commentContext } },
 				}
-				return res
-					.status(200)
-					.json({ success: true, message: "pulled" });
+			);
+			// decrease amount of the item likes/dislikes
+			if (state === false) {
+				await Commentary.findByIdAndUpdate(commentContext, {
+					$inc: { dislikes: -1 },
+				});
 			} else {
-				// user wants to change reaction
-				await User.updateOne(
-					{ _id: id, "reactions.commentContext": commentContext },
-					{ $set: { "reactions.$.state": state } }
-				);
-				if (state === false) {
-					await Commentary.findByIdAndUpdate(commentContext, {
-						$inc: { dislikes: 1, likes: -1 },
-					});
-				} else {
-					await Commentary.findByIdAndUpdate(commentContext, {
-						$inc: { likes: 1, dislikes: -1 },
-					});
-				}
-				return res
-					.status(200)
-					.json({ success: true, message: "switched" });
+				await Commentary.findByIdAndUpdate(commentContext, {
+					$inc: { likes: -1 },
+				});
 			}
 		} else {
-			// user set reaction
-			const user = await User.findByIdAndUpdate(
-				{ _id: id },
-				{ $push: { reactions: { commentContext, state } } }
+			// user wants to change reaction
+			await User.updateOne(
+				{ _id: id, "reactions.commentContext": commentContext },
+				{ $set: { "reactions.$.state": state } }
 			);
 			if (state === false) {
 				await Commentary.findByIdAndUpdate(commentContext, {
-					$inc: { dislikes: 1 },
+					$inc: { dislikes: 1, likes: -1 },
 				});
 			} else {
 				await Commentary.findByIdAndUpdate(commentContext, {
-					$inc: { likes: 1 },
+					$inc: { likes: 1, dislikes: -1 },
 				});
 			}
-			return res.status(200).json({ success: true, message: "pushed" });
 		}
-	} catch (err) {
-		return res.status(500).json({ message: "Server error", err });
+	} else {
+		// user set reaction
+		const user = await User.findByIdAndUpdate(
+			{ _id: id },
+			{ $push: { reactions: { commentContext, state } } }
+		);
+		if (state === false) {
+			await Commentary.findByIdAndUpdate(commentContext, {
+				$inc: { dislikes: 1 },
+			});
+		} else {
+			await Commentary.findByIdAndUpdate(commentContext, {
+				$inc: { likes: 1 },
+			});
+		}
 	}
+	return true;
 };
 
 module.exports = (User) => {
@@ -372,7 +310,6 @@ module.exports = (User) => {
 		registerUser: registerUser(User),
 		createToken: createToken,
 		loginUser: loginUser(User),
-		logoutUser: logoutUser,
 		getUser: getUser(User),
 		userSubscriptions: userSubscriptions(User),
 		getSubscribeState: getSubscribeState(User),

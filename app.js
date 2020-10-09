@@ -26,7 +26,8 @@ app.use("/api/comment", comment);
 app.use("/api/search", search);
 
 app.use((err, req, res, next) => {
-	res.status(500).json({ message: "Server error", error: err.message });
+	console.error(err);
+	res.status(err.statusCode || 500).json({ message: "Server error" });
 });
 
 app.get("*", (req, res) => {
