@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const Commentary = require("../model/Comment");
-const Video = require("../model/Video");
+const Commentary = require("../libs/comment/comment_model");
+const Video = require("../libs/video/video_model");
 const auth = require("../middleware/auth");
 
 router.post("/addComment", auth, async (req, res) => {

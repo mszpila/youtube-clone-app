@@ -1,23 +1,25 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const createToken = (user) => {
-	jwt.sign(
-		user.id,
-		"randomString",
-		{
-			expiresIn: 3600,
-		},
-		(error, token) => {
-			if (error) {
-				let err = new Error("Could not create token", error);
-				err.statusCode = 500;
-				throw err;
-			} else {
-				return token;
+const createToken = (id) => {
+	return new Promise((resolve, reject) => {
+		jwt.sign(
+			{ id },
+			"randomString",
+			{
+				expiresIn: 3600,
+			},
+			(error, token) => {
+				if (error) {
+					let err = new Error("Could not create token", error);
+					err.statusCode = 500;
+					reject(err);
+				} else {
+					resolve(token);
+				}
 			}
-		}
-	);
+		);
+	});
 };
 
 const registerUser = (User) => async (username, email, password) => {

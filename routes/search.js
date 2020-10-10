@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Video = require("../model/Video");
+const Video = require("../libs/video/video_model");
 
 router.get("/", (req, res) => {
 	const search = req.query.search;

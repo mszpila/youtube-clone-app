@@ -1,14 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const User = require("../model/User");
-const Video = require("../model/Video");
-const Commentary = require("../model/Comment");
+const User = require("../libs/user/user_model");
+const Video = require("../libs/video/video_model");
+const Commentary = require("../libs/comment/comment_model");
 const auth = require("../middleware/auth");
 const ffmpeg = require("fluent-ffmpeg");
 const fs = require("fs");
 const path = require("path");
-const Visitor = require("../model/Visitor");
+const Visitor = require("../libs/visitor/visitor_model");
 const AWS = require("aws-sdk");
 // var S3 = require("aws-sdk/clients/s3");
 

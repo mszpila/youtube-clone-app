@@ -21,54 +21,60 @@ describe("API test", () => {
 	afterAll((done) => {
 		server.close(done);
 	});
+
 	describe("User routes test", () => {
 		describe("Register route test", () => {
 			it("register a user", async () => {
-				await request(server)
+				const response = await request(server)
 					.post("/api/users/register")
 					.send({
 						username: "testUser",
 						email: "test@example.com",
 						password: "test1234",
-					})
-					.expect(200);
+					});
+				const user = response.body;
+				const token = response.headers["set-cookie"]; // [0].split(";")[0].split("=")[1];
+				// console.log(token);
+				expect(token).toBeTruthy();
+				expect(response.status).toBe(200);
+				expect(user.username).toEqual("testUser");
+				expect(user.email).toEqual("test@example.com");
+				expect(user.password).toBeTruthy();
+				expect(user.password).not.toEqual("test1234");
+			});
 
-				// const response = await request.get('/test')
+			// it("fails to register if missing a username", async () => {
+			// 	await request(server)
+			// 		.post("/api/users/register")
+			// 		.send({
+			// 			username: "",
+			// 			email: "test@example.com",
+			// 			password: "test1234",
+			// 		})
+			// 		.expect(400);
+			// });
 
-				// expect(response.status).toBe(200)
-				// expect(response.body.message).toBe('pass!')
-				// done()
-			});
-			it("fails to register if missing a username", async () => {
-				await request(server)
-					.post("/api/users/register")
-					.send({
-						username: "",
-						email: "test@example.com",
-						password: "test1234",
-					})
-					.expect(400);
-			});
-			it("fails to register if missing an email", async () => {
-				await request(server)
-					.post("/api/users/register")
-					.send({
-						username: "testUser",
-						email: "",
-						password: "test1234",
-					})
-					.expect(400);
-			});
-			it("fails to register if missing a password", async () => {
-				await request(server)
-					.post("/api/users/register")
-					.send({
-						username: "testUser",
-						email: "test@example.com",
-						password: "",
-					})
-					.expect(400);
-			});
+			// it("fails to register if missing an email", async () => {
+			// 	await request(server)
+			// 		.post("/api/users/register")
+			// 		.send({
+			// 			username: "testUser",
+			// 			email: "",
+			// 			password: "test1234",
+			// 		})
+			// 		.expect(400);
+			// });
+
+			// it("fails to register if missing a password", async () => {
+			// 	await request(server)
+			// 		.post("/api/users/register")
+			// 		.send({
+			// 			username: "testUser",
+			// 			email: "test@example.com",
+			// 			password: "",
+			// 		})
+			// 		.expect(400);
+			// });
 		});
 	});
 });

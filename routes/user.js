@@ -7,10 +7,10 @@ router.post("/register", async (req, res, next) => {
 	const { username, email, password } = req.body;
 	try {
 		const user = await UserService.registerUser(username, email, password);
-		const token = UserService.createToken(user);
+		const token = await UserService.createToken(user._id);
 		res.status(200)
 			.cookie("login_auth", token, { httpOnly: true })
-			.json(token, user);
+			.json(user);
 	} catch (err) {
 		next(err);
 	}
