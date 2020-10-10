@@ -23,6 +23,11 @@ const createToken = (id) => {
 };
 
 const registerUser = (User) => async (username, email, password) => {
+	if (!username || !email || !password) {
+		let err = new Error("Empty field");
+		err.statusCode = 500;
+		throw err;
+	}
 	let user = null;
 	// cheking username
 	user = await User.findOne({
