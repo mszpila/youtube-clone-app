@@ -375,7 +375,7 @@ router.get("/getVideoById", (req, res) => {
 });
 
 router.post("/save", auth, async (req, res) => {
-	const { title, description, category, private, id } = req.body;
+	const { title, description, category, privacy, id } = req.body;
 	const video = await Video.findById(id).populate("user");
 	if (video.user.id === req.user.id) {
 		Video.findByIdAndUpdate(
@@ -385,7 +385,7 @@ router.post("/save", auth, async (req, res) => {
 					title,
 					description,
 					// category,
-					private,
+					private: privacy,
 					publishDate: Date.now(),
 				},
 			},

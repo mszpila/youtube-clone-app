@@ -253,7 +253,7 @@ const getCommentReaction = (User) => async (id, commentContext) => {
 	}
 };
 
-const postCommentReaction = (User, {}, Commentary) => async (
+const postCommentReaction = (User, Video, Commentary) => async (
 	id,
 	commentContext
 ) => {

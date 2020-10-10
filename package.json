@@ -3,10 +3,14 @@
 	"version": "1.0.0",
 	"description": "",
 	"main": "index.js",
+	"jest": {
+		"testEnvironment": "node"
+	},
 	"scripts": {
 		"test": "jest",
+		"test:watch": "jest --watch",
 		"test:app": "jest --testPathPattern app_test",
-		"test:sevice": "jest --testPathPattern service_test",
+		"test:service": "jest --testPathPattern service_test",
 		"test:model": "jest --testPathPattern model_test",
 		"build": "cd client && npm install && npm run build",
 		"start": "node index.js"

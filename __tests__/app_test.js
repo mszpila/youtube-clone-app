@@ -1,8 +1,16 @@
 const app = require("../app");
 const request = require("supertest");
 const mongoose = require("mongoose");
-const mongodb = "mongodb://localhost:27017/test_db";
+const mongodb = "mongodb://localhost:27017/test_app_db";
 mongoose.connect(mongodb);
+
+async function removeAllCollections() {
+	const collections = Object.keys(mongoose.connection.collections);
+	for (const collectionName of collections) {
+		const collection = mongoose.connection.collections[collectionName];
+		await collection.deleteMany();
+	}
+}
 
 describe("API test", () => {
 	it("has a module", () => {
@@ -13,6 +21,10 @@ describe("API test", () => {
 
 	beforeAll(() => {
 		server = app.listen(5001);
+	});
+
+	afterEach(async () => {
+		await removeAllCollections();
 	});
 
 	afterAll((done) => {
@@ -30,6 +42,12 @@ describe("API test", () => {
 						password: "test1234",
 					})
 					.expect(200);
+
+				// const response = await request.get('/test')
+
+				// expect(response.status).toBe(200)
+				// expect(response.body.message).toBe('pass!')
+				// done()
 			});
 			it("fails to register if missing a username", async () => {
 				await request(server)
