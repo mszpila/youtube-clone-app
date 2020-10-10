@@ -1,6 +1,6 @@
 Youtube clone app deployed on the Heroku with Amazon S3 storage.
 
-URL:https://youtube-clone-back.herokuapp.com/
+URL:https://youtube-clone--app.herokuapp.com
 
 To fix:
 - implement better error handling (for both client and server)
