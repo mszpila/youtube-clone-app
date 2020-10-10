@@ -1,18 +1,13 @@
 const app = require("../app");
 const request = require("supertest");
-const mongoose = require("mongoose");
-const mongodb = "mongodb://localhost:27017/test_app_db";
-mongoose.connect(mongodb);
-
-async function removeAllCollections() {
-	const collections = Object.keys(mongoose.connection.collections);
-	for (const collectionName of collections) {
-		const collection = mongoose.connection.collections[collectionName];
-		await collection.deleteMany();
-	}
-}
+// const mongoose = require("mongoose");
+// const mongodb = "mongodb://localhost:27017/test_app_db";
+// mongoose.connect(mongodb);
+const { setupDB } = require("../test-setup");
 
 describe("API test", () => {
+	setupDB("endpoint_testing");
+
 	it("has a module", () => {
 		expect(app).toBeDefined();
 	});
@@ -23,12 +18,7 @@ describe("API test", () => {
 		server = app.listen(5001);
 	});
 
-	afterEach(async () => {
-		await removeAllCollections();
-	});
-
 	afterAll((done) => {
-		mongoose.connection.close();
 		server.close(done);
 	});
 	describe("User routes test", () => {
