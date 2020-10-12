@@ -34,57 +34,55 @@ describe("API test", () => {
 					});
 				const user = response.body;
 				const token = response.headers["set-cookie"]; // [0].split(";")[0].split("=")[1];
-				// console.log(token);
-				expect(token).toBeTruthy();
 				expect(response.status).toBe(200);
+				expect(token).toBeTruthy();
 				expect(user.username).toEqual("testUser");
 				expect(user.email).toEqual("test@example.com");
 				expect(user.password).toBeTruthy();
 				expect(user.password).not.toEqual("test1234");
+				expect(user._id).toBeDefined();
 			});
 
 			it("fails to register if missing a username", async () => {
-				await request(server)
+				request(server)
 					.post("/api/users/register")
 					.send({
 						username: "",
 						email: "test@example.com",
 						password: "test1234",
 					})
-					.expect(500);
+					.expect(400);
 			});
 
 			it("fails to register if missing an email", async () => {
-				await request(server)
+				request(server)
 					.post("/api/users/register")
 					.send({
 						username: "testUser",
 						email: "",
 						password: "test1234",
 					})
-					.expect(500);
+					.expect(400);
 			});
 
 			it("fails to register if missing a password", async () => {
-				await request(server)
+				request(server)
 					.post("/api/users/register")
 					.send({
 						username: "testUser",
 						email: "test@example.com",
 						password: "",
 					})
-					.expect(500);
+					.expect(400);
 			});
 
 			it("user already exists", async () => {
-				await request(server)
-					.post("/api/users/register")
-					.send({
-						username: "testUser",
-						email: "test2@example.com",
-						password: "test1234",
-					})
-					.expect(200);
+				await request(server).post("/api/users/register").send({
+					username: "testUser",
+					email: "test2@example.com",
+					password: "test1234",
+				});
+				// .expect(200);
 				await request(server)
 					.post("/api/users/register")
 					.send({
@@ -96,14 +94,12 @@ describe("API test", () => {
 			});
 
 			it("email already exists", async () => {
-				await request(server)
-					.post("/api/users/register")
-					.send({
-						username: "testUser",
-						email: "test@example.com",
-						password: "test1234",
-					})
-					.expect(200);
+				await request(server).post("/api/users/register").send({
+					username: "testUser",
+					email: "test@example.com",
+					password: "test1234",
+				});
+				// .expect(200);
 				await request(server)
 					.post("/api/users/register")
 					.send({

@@ -25,7 +25,7 @@ const createToken = (id) => {
 const registerUser = (User) => async (username, email, password) => {
 	if (!username || !email || !password) {
 		let err = new Error("Empty field");
-		err.statusCode = 500;
+		err.statusCode = 400;
 		throw err;
 	}
 	let user = null;
@@ -49,19 +49,22 @@ const registerUser = (User) => async (username, email, password) => {
 		throw err;
 	}
 
-	// creating user object
-	user = new User({
-		username,
-		email,
-		password,
-	});
+	// creating user
+	// user = new User({
+	// 	username,
+	// 	email,
+	// 	password,
+	// });
 
 	// hashing password
 	const salt = await bcrypt.genSalt(10);
-	user.password = await bcrypt.hash(password, salt);
+	// user.password = await bcrypt.hash(password, salt);
+	password = await bcrypt.hash(password, salt);
 
 	// saving user in db
-	return await user.save();
+	user = await User.create({ username, email, password });
+	return user;
+	// return await user.save();
 };
 
 const loginUser = (User) => async (login, password) => {

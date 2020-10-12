@@ -1,68 +1,54 @@
-const UserService = require("../user_service");
 const sinon = require("sinon");
+const UserService = require("../user_service");
+const User = require("../user_model");
 
 describe("UserService test", () => {
 	it("has a module", () => {
 		expect(UserService).toBeDefined();
 	});
 
-	// describe("register test", () => {
-	// 	it("register", () => {
-	// 		const MockModel = {
-	// 			find: sinon.spy(),
-	// 		};
-
-	// 		const userService = UserService(MockModel);
-	// 		userService.registerUser(
-	// 			"testUser",
-	// 			"test@example.com",
-	// 			"test1234"
-	// 		);
-	// 		const expected = true;
-	// 		const actual = MockModel.find.calledOnce;
-	// 		expect(actual).toEqual(expected);
-	// 	});
-	// });
-
 	describe("registerUser test", () => {
-		it("registers a user", () => {
-			// const save = sinon.spy();
+		it("registers a user", async () => {
+			// const MockModel = {
+			// 	findOne: sinon.spy(),
+			// 	save: sinon.spy(),
+			// };
+
+			const MockModel = sinon.stub(User);
+
+			// MockModel.create()
+
+			// code below doesn't work because of findOne()
+
 			// let username;
 			// let email;
 			// let password;
+			// save = sinon.spy();
+			// findOne = sinon.spy();
 
-			// higher order funtion
-			// it will be like userService(MockModel)(registerUser)
-			// the args from registerUser will come as data to MockModel
-			// function
-
-			// const MockModel = (data) => {
+			// const MockModel = function (data) {
 			// 	username = data.username;
 			// 	email = data.email;
 			// 	password = data.password;
-			// 	return { ...data, save };
+
+			// 	return {
+			// 		...data,
+			// 		save,
+			// 		findOne,
+			// 	};
 			// };
 
-			const MockModel = {
-				username,
-				email,
-				password,
-				save: sinon.spy(),
-			};
-
 			const userService = UserService(MockModel);
-			const user = userService.registerUser(
+			await userService.registerUser(
 				"testUser",
 				"test@example.com",
 				"test1234"
 			);
 
-			const expected = true;
-			const actual = MockModel.save.calledOnce;
-			expect(actual).toEqual(expected);
-			expect(user.username).toEqual("testUser");
-			expect(user.email).toEqual("test@example.com");
-			expect(user.password).toEqual("test1234");
+			const findOne = MockModel.findOne.callCount;
+			const create = MockModel.create.callCount;
+			expect(findOne).toEqual(2);
+			expect(create).toEqual(1);
 		});
 	});
 });
