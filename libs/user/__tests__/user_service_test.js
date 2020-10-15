@@ -9,34 +9,7 @@ describe("UserService test", () => {
 
 	describe("registerUser test", () => {
 		it("registers a user", async () => {
-			// const MockModel = {
-			// 	findOne: sinon.spy(),
-			// 	save: sinon.spy(),
-			// };
-
 			const MockModel = sinon.stub(User);
-
-			// MockModel.create()
-
-			// code below doesn't work because of findOne()
-
-			// let username;
-			// let email;
-			// let password;
-			// save = sinon.spy();
-			// findOne = sinon.spy();
-
-			// const MockModel = function (data) {
-			// 	username = data.username;
-			// 	email = data.email;
-			// 	password = data.password;
-
-			// 	return {
-			// 		...data,
-			// 		save,
-			// 		findOne,
-			// 	};
-			// };
 
 			const userService = UserService(MockModel);
 			await userService.registerUser(
@@ -49,6 +22,33 @@ describe("UserService test", () => {
 			const create = MockModel.create.callCount;
 			expect(findOne).toEqual(2);
 			expect(create).toEqual(1);
+		});
+
+		it("should return user W/O sinon", async () => {
+			const user = {
+				_id: 1,
+				username: "test",
+				email: "test@example.com",
+				password: "test1234",
+			};
+
+			const MockModel = {
+				findOne: async () => {
+					return false;
+				},
+				create: async () => {
+					return user;
+				},
+			};
+
+			const userService = UserService(MockModel);
+			const register = await userService.registerUser(
+				"testUser",
+				"test@example.com",
+				"test1234"
+			);
+
+			expect(register).toBe(user);
 		});
 	});
 });
