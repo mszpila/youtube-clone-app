@@ -1,11 +1,29 @@
 version: "3.8"
 services:
+    # server
     youtube-clone-app:
         container_name: server
         build: ./
         command: npm start
         working_dir: /user/src/youtube-clone-app
+        environment:
+            POSTGRESQL_URI: postgres://sally:secret@db_postgres:5432/youtube-clone-app-docker
+        # links:
+        #     - postgres
         ports:
-            - "3000:3000"
+            - "5000:5000"
         volumes:
             - ./:/user/src/youtube-clone-app
+
+    # db - project uses mongodb, postgres is just from the tutorial
+    postgres:
+        # image: postgres
+        container_name: db_postgres
+        build: ./postgres/
+        environment:
+            POSTGRESQL_USER: sally
+            POSTGRESQL_PASSWORD: secret
+            POSTGRESQL_NAME: youtube-clone-app-docker
+            POSTGRESQL_HOST: postgres
+        ports:
+            - "5432:5432"
