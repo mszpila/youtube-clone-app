@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+    youtube-clone-app:
+        container_name: server
+        build: ./
+        command: npm start
+        working_dir: /user/src/youtube-clone-app
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./:/user/src/youtube-clone-app

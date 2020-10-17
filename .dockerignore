@@ -1,0 +1,16 @@
+node_modules
+npm-debug.log
+
+# .env
+
+public/uploads/frames/**
+public/uploads/temp/**
+public/uploads/videos/**
+public/uploads/thumbnails/**
+public/uploads/previews/**
+
+!public/uploads/videos/.gitkeep
+!public/uploads/thumbnails/.gitkeep
+!public/uploads/previews/.gitkeep
+!public/uploads/frames/.gitkeep
+!public/uploads/temp/.gitkeep
