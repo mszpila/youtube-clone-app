@@ -71,7 +71,10 @@ router.post("/signup", async (req, res) => {
 			(err, token) => {
 				if (err) throw err;
 				res.status(200)
-					.cookie("login_auth", token, { httpOnly: true })
+					.cookie("login_auth", token, {
+						httpOnly: true,
+						secure: true,
+					})
 					.json({
 						token,
 						user,
@@ -125,7 +128,10 @@ router.post("/login", async (req, res) => {
 			(err, token) => {
 				if (err) throw err;
 				res.status(200)
-					.cookie("login_auth", token, { httpOnly: true })
+					.cookie("login_auth", token, {
+						httpOnly: true,
+						secure: true,
+					})
 					.json({
 						token,
 						user,
@@ -141,7 +147,9 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/logout", auth, async (req, res) => {
-	res.clearCookie("login_auth", { httpOnly: true }).json({ success: true });
+	res.clearCookie("login_auth", { httpOnly: true, secure: true }).json({
+		success: true,
+	});
 });
 
 router.get("/me", auth, async (req, res) => {
