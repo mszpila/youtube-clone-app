@@ -9,6 +9,7 @@ const multer = require("multer");
 const InitiateMongoServer = require("./config/db");
 const cors = require("cors");
 const path = require("path");
+const helmet = require("helmet");
 
 // Initiate Mongo Server
 InitiateMongoServer();
@@ -18,6 +19,7 @@ const app = express();
 // PORT
 const PORT = process.env.PORT || 5000;
 
+app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors()); // { origin: "http://localhost:3000/", credentials: true })
