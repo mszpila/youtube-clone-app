@@ -34,6 +34,20 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+const requireHTTPS = (req, res, next) => {
+	// The 'x-forwarded-proto' check is for Heroku
+	if (
+		!req.secure &&
+		req.get("x-forwarded-proto") !== "https" &&
+		process.env.NODE_ENV !== "development"
+	) {
+		return res.redirect("https://" + req.headers.host + req.url);
+	}
+	next();
+};
+
+app.use(requireHTTPS);
+
 app.use("/public", express.static("public"));
 app.use(express.static(path.join(__dirname, "client/build")));
 
