@@ -10,6 +10,7 @@ const InitiateMongoServer = require("./config/db");
 const cors = require("cors");
 const path = require("path");
 const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 // Initiate Mongo Server
 InitiateMongoServer();
@@ -47,6 +48,18 @@ const requireHTTPS = (req, res, next) => {
 };
 
 app.use(requireHTTPS);
+
+// Enable if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
+// see https://expressjs.com/en/guide/behind-proxies.html
+// app.set('trust proxy', 1);
+
+const limiter = rateLimit({
+	windowMs: 5 * 60 * 1000, // 5 minutes
+	max: 500, // limit each IP to 100 requests per windowMs
+});
+
+// only apply to requests that begin with /api/
+app.use("/api/", limiter);
 
 app.use("/public", express.static("public"));
 app.use(express.static(path.join(__dirname, "client/build")));
